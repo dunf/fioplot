@@ -1,15 +1,12 @@
 import os
 import sys
-import matplotlib
+import csv
+
+from matplotlib import pyplot as plt
+import numpy as np
 
 
-#import matplotlib.pyplot as plt
-#plt.plot([[1,2,3,4],[4,3,2,1], [2,2,3,3]])
-#plt.ylabel('some numbers')
-#plt.show()
-
-
-help(matplotlib)
+help(pyplot)
 
 class Plotter(object):
     def __init__(self):
@@ -22,6 +19,7 @@ class Plotter(object):
 
 
 def main():
+    pass
     pass
 
 
