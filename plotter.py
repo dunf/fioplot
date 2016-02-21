@@ -1,5 +1,11 @@
 #!/usr/bin/python3
 
+# This script reads JSON files outputted by Flexible IO tester (FIO) and plots the results in a
+# bar chart using matplotlib.
+# Usage: ./plotter.py -d path_to_results_folder
+
+
+
 import os
 import sys
 import json
@@ -21,7 +27,28 @@ class Args(object):
 class Plotter(object):
     args = Args()
     results = {}
-    test_type = { 'read': 'read', 'write': 'write', 'mixed': 'mixed' }
+   # test_type = { 'read': 'read', 'write': 'write', 'mixed': 'mixed' }
+    testtype = {
+    'fsseqR1-16': 'Seq Read bs=256K, 1 job, IOdepth 16',
+    'fsseqW1-16': 'Seq Write bs=256K 1 job, IOdepth 16',
+	'fsrandR1-1': 'Random Read 1 jobs, IOdepth 1',
+	'fsrandR1-16': 'Random Read 1 jobs, IOdepth 16',
+	'fsrandR1-32': 'Random Read 1 jobs, IOdepth 32',
+	'fsrandR1-64': 'Random Read 1 jobs, IOdepth 64',
+	'fsrandR16-1': 'Random Read 16 jobs, IOdepth 1',
+	'fsrandR16-16': 'Random Read 16 jobs, IOdepth 16',
+	'fsrandR16-32': 'Random Read 16 jobs, IOdepth 32',
+	'fsrandR16-64': 'Random Read 16 jobs, IOdepth 64',
+	'fsrandW1-1': 'Random Write 1 jobs, IOdepth 1',
+	'fsrandW1-16': 'Random Write 1 jobs, IOdepth 16',
+	'fsrandW1-32': 'Random Write 1 jobs, IOdepth 32',
+	'fsrandW1-64': 'Random Write 1 jobs, IOdepth 64',
+	'fsrandW16-1': 'Random Write 16 jobs, IOdepth 1',
+	'fsrandW16-16': 'Random Write 16 jobs, IOdepth 16',
+	'fsrandW16-32': 'Random Write 16 jobs, IOdepth 32',
+	'fsrandW16-64': 'Random Write 16 jobs, IOdepth 64',
+    'fsmixedRW703016-16': 'Mixed RW 70/30 bs=8K, 16 jobs, IOdepth 16',
+    }
 
     def read_files(self):
         for fil in os.listdir(self.args.DIR):
@@ -30,39 +57,40 @@ class Plotter(object):
                 jobname = j_obj['jobs'][0]['jobname']
                 iops_list =  []
                 jobs = len(j_obj['jobs'])
-                read_or_write = j_obj['jobs'][0]['read']['io_bytes']
-
-                if read_or_write == 0:
-                    read_or_write = 'write'
-                else:
-                    read_or_write = 'read'
+                try:
+                    test_type = j_obj['jobs'][0]['read']['io_bytes']
+                    if test_type == 0:                                # Zero bytes read in test
+                        test_type = 'write'
+                    else:
+                        test_type = 'read'
+                except KeyError:
+                    try:
+                        test_type = j_obj['jobs'][0]['mixed']['io_bytes']
+                        test_type = 'mixed'
+                    except KeyError:
+                        print('Invalid file')
                 total_iops = 0
                 for job in range(jobs):
-                    iops = j_obj['jobs'][job][read_or_write]['iops']
+                    iops = j_obj['jobs'][job][test_type]['iops']
                     iops_list.append(iops)
                     total_iops += iops
                 self.results.update({jobname: total_iops})
-       # print(self.results)
 
     def plot(self):
-        #plt.title('tittei')
-        plt.xlabel('GROUP')
         plt.ylabel('IOPS')
+        width=0.3
         index = 0
         for key, value in sorted(self.results.items()):
-            plt.bar(index, value, color='y')
-            print(key, value)
+            plt.bar(index, value, width, color='y', align='center', )
+            #plt.xticks(, value)
+          #  print(key, value)
             index += 1
-
+          #  plt.xticks(, self.results.keys())
 
         plt.show()
 
-def usage():
-    if len(sys.argv) == 0:
-        print("Usage: ", sys.argv[0], " -d", " path to directory where JSON files are located...")
 
 def main():
-    usage()
     p = Plotter()
     p.read_files()
     p.plot()
