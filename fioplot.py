@@ -81,7 +81,7 @@ class Plotter(object):
 
     def plot(self):
         colors = [
-            '#ff0000', '#00FF00', '0000FF', '#FFFF00', '#CCEEFF', '#666666', '#FF00CC', '#6699FF',
+            '#ff0000', '0000FF', '#FFFF00', '#CCEEFF', '#666666', '#FF00CC', '#6699FF',
             '#663366', '#00CCFF', '#00FFCC', '#003300', '#3399FF', '#CCCCFF', '#003333', '#009999',
             '#660000', '#CC0000', '#CCCC00', '#CCCCCC', '#009933', '#006600', '#003399', '#CCCC99'
         ]
@@ -89,11 +89,10 @@ class Plotter(object):
         width=1
         index = 0
         self.results.sort()
-        for key, value in self.results, self.results:
-            print(key, value)
-            plt.bar(index, value, width, color=colors[5], align='center')
+        for key, value in self.results:
+            plt.bar(index, value, width, color=float(colors[index]), align='center')
             index += 1
-        plt.xticks()
+        plt.xticks(range(len(self.results)), self.results, rotation=270)
 
         #for key, value, col in sorted(zip(self.results.items(), range(len(self.results)))):
         #    plt.bar(index, value, width, color=colors[col], align='center')
