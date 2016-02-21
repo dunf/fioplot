@@ -16,6 +16,7 @@ from matplotlib import pyplot as plt
 import numpy as np
 
 
+
 class Args(object):
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--directory", help="Directory where JSON files are located...",
@@ -26,9 +27,9 @@ class Args(object):
 
 class Plotter(object):
     args = Args()
-    results = {}
-   # test_type = { 'read': 'read', 'write': 'write', 'mixed': 'mixed' }
-    testtype = {
+    #results = {}
+    results = []
+    test_description = {
     'fsseqR1-16': 'Seq Read bs=256K, 1 job, IOdepth 16',
     'fsseqW1-16': 'Seq Write bs=256K 1 job, IOdepth 16',
 	'fsrandR1-1': 'Random Read 1 jobs, IOdepth 1',
@@ -68,23 +69,38 @@ class Plotter(object):
                         test_type = j_obj['jobs'][0]['mixed']['io_bytes']
                         test_type = 'mixed'
                     except KeyError:
-                        print('Invalid file')
+                        continue
                 total_iops = 0
                 for job in range(jobs):
                     iops = j_obj['jobs'][job][test_type]['iops']
                     iops_list.append(iops)
                     total_iops += iops
-                self.results.update({jobname: total_iops})
+                self.results.append((jobname, total_iops))
+
+                #self.results.update({jobname: total_iops})
 
     def plot(self):
+        colors = [
+            '#ff0000', '#00FF00', '0000FF', '#FFFF00', '#CCEEFF', '#666666', '#FF00CC', '#6699FF',
+            '#663366', '#00CCFF', '#00FFCC', '#003300', '#3399FF', '#CCCCFF', '#003333', '#009999',
+            '#660000', '#CC0000', '#CCCC00', '#CCCCCC', '#009933', '#006600', '#003399', '#CCCC99'
+        ]
         plt.ylabel('IOPS')
-        width=0.3
+        width=1
         index = 0
-        for key, value in sorted(self.results.items()):
-            plt.bar(index, value, width, color='y', align='center', )
-            #plt.xticks(, value)
-          #  print(key, value)
+        self.results.sort()
+        for key, value in self.results, self.results:
+            print(key, value)
+            plt.bar(index, value, width, color=colors[5], align='center')
             index += 1
+        plt.xticks()
+
+        #for key, value, col in sorted(zip(self.results.items(), range(len(self.results)))):
+        #    plt.bar(index, value, width, color=colors[col], align='center')
+      #  plt.bar(range(len(self.results)), self.results.values(), width, color=colors[10], align='center')
+     #   plt.xticks(range(len(self.results)), list(self.results.keys()), rotation=270 )
+      #  plt.legend(list(self.results.keys()))
+          #  print(key, value)
           #  plt.xticks(, self.results.keys())
 
         plt.show()
@@ -98,3 +114,4 @@ def main():
 if __name__ == "__main__":
     main()
 
+#
