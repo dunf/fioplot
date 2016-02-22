@@ -2,7 +2,7 @@
 
 # This script reads JSON files outputted by Flexible IO tester (FIO) and plots the results in a
 # bar chart using matplotlib.
-# Usage: ./plotter.py -d path_to_results_folder
+# Usage: ./plotter.py -d path_to_results_folder [-t title_of_test]
 
 
 
@@ -10,20 +10,18 @@ import os
 import sys
 import json
 import argparse
-import bs4
-
 from matplotlib import pyplot as plt
-import numpy as np
+
 
 
 
 class Args(object):
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--directory", help="Directory where JSON files are located...")
- #   parser.add.argument("-t", "--title", help="Title in the chart...", default=None)
+    parser.add_argument('-t', '--title', help='Title in chart...', default=None)
     args = parser.parse_args()
     DIR = args.directory
-  #  TITLE = args.title
+    TITLE = args.title
 
 
 class Plotter(object):
@@ -84,19 +82,19 @@ class Plotter(object):
             '#663366', '#00CCFF', '#00FFCC', '#003300', '#3399FF', '#CCCCFF', '#003333', '#009999',
             '#660000', '#CC0000', '#CCCC00', '#CCCCCC', '#009933', '#006600', '#003399', '#CCCC99'
         ]
+        if self.args.TITLE is not None:
+            plt.title(self.args.TITLE)
         plt.xlabel('IOPS')
-        fig = plt.figure(1)#, figsize=(10, 25))
-        fig.subplots_adjust(bottom=0.35, top=0.98, )
+        fig = plt.figure(1)
+        fig.subplots_adjust(bottom=0.35, top=0.92)
         ax = plt.subplot(1,1,1)
-
-
         width=1
         index = 0
         self.results.sort()
         tmp = []
         tmp2 = []
         for key, value in self.results:
-            plt.barh(index, value, width, color=colors[index], align='center')
+            plt.barh(index, value, height=1, color=colors[index], align='center', )
             tmp2.append(value)
             for description in self.test_description:
                 if description[0] == key:
@@ -105,7 +103,6 @@ class Plotter(object):
         plt.yticks(range(len(self.results)), tmp2 )
         lgd =  ax.legend(tmp, loc=8, bbox_to_anchor=(0.5, -0.40), fontsize='xx-small', ncol=3, fancybox=True).draggable()
         plt.show()
-
         fig.savefig('./telenor_is_shit.pdf', orientation='portrait', format='pdf')
 
 
