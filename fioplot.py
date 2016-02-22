@@ -5,7 +5,6 @@
 # Usage: ./plotter.py -d path_to_results_folder [-t title_of_test]
 
 
-
 import os
 import sys
 import json
@@ -13,22 +12,20 @@ import argparse
 from matplotlib import pyplot as plt
 
 
-
-
 class Args(object):
     parser = argparse.ArgumentParser()
     parser.add_argument("-d", "--directory", help="Directory where JSON files are located...")
-    parser.add_argument('-t', '--title', help='Title in chart...', default=None)
+    parser.add_argument('-f', '--filename', help='Output filename... Format=pdf', nargs=1)
     args = parser.parse_args()
     DIR = args.directory
-    TITLE = args.title
+    FILENAME = args.filename
 
 
 class Plotter(object):
     args = Args()
-    #results = {}
+    filename = str(args.FILENAME).split("'")[1]
     results = []
-    test_description = [
+    test_description = [        # Used for description in legend
         ('fsseqR1-16', 'Seq Read bs=256K, 1 job, IOdepth 16'),
         ('fsseqW1-16', 'Seq Write bs=256K 1 job, IOdepth 16'),
         ('fsrandR1-1', 'Random Read 1 jobs, IOdepth 1'),
@@ -47,7 +44,7 @@ class Plotter(object):
         ('fsrandW16-16', 'Random Write 16 jobs, IOdepth 16'),
         ('fsrandW16-32', 'Random Write 16 jobs, IOdepth 32'),
         ('fsrandW16-64', 'Random Write 16 jobs, IOdepth 64'),
-        ('fsmixedRW703016-16', 'Mixed RW 70/30 bs=8K, 16 jobs, IOdepth 16')
+        ('fsmixedRW703016-16', 'Mixed RW 70/30 bs=8K, 16 jobs, IOdepth 16'),
     ]
 
     def read_files(self):
@@ -77,35 +74,34 @@ class Plotter(object):
                 self.results.append((jobname, total_iops))     # Tuple in array
 
     def plot(self):
-        colors = [
-            '#ee0000', '#0000FF', '#FFFF00', '#CCEEFF', '#666666', '#FF00CC', '#6699FF',
-            '#663366', '#00CCFF', '#00FFCC', '#003300', '#3399FF', '#CCCCFF', '#003333', '#009999',
-            '#660000', '#CC0000', '#CCCC00', '#CCCCCC', '#009933', '#006600', '#003399', '#CCCC99'
+        colors = [      # Colors used on bars
+            '#FF0000', '#00FFFF', '#0000FF', '#5CB3FF', '#800080', '#FFFF00', '#00FF00', '#FF00FF',
+            '#C0C0C0', '#FFA500', '#A52A2A', '#008000', '#808000', '#E66C2C', '#FCDFFF', '#D462FF',
+            '#B5EAAA', '#307D7E', '#7FFFD4'
         ]
-        if self.args.TITLE is not None:
-            plt.title(self.args.TITLE)
-        plt.xlabel('IOPS')
+        plt.title('IOPS jlkdsajf lksajf ølkajf fdflksajflkdsa jf lkdsajflkdsajflkdsafjf')       # Using title as xlabel
+        # plt.xlabel('IOPS')
         fig = plt.figure(1)
-        fig.subplots_adjust(bottom=0.35, top=0.92)
+        fig.subplots_adjust(left=0.5, bottom=0.35, top=0.92)
         ax = plt.subplot(1,1,1)
         width=1
         index = 0
         self.results.sort()
-        tmp = []
-        tmp2 = []
+        keys = []
+        values = []
         for key, value in self.results:
             plt.barh(index, value, height=1, color=colors[index], align='center', )
-            tmp2.append(value)
+            values.append(value)
             for description in self.test_description:
                 if description[0] == key:
-                    tmp.append(description[1])
+                    keys.append(description[1])
             index += 1
-        plt.yticks(range(len(self.results)), tmp2 )
-        lgd =  ax.legend(tmp, loc=8, bbox_to_anchor=(0.5, -0.40), fontsize='xx-small', ncol=3, fancybox=True).draggable()
+        plt.yticks(range(len(self.results)), keys)
+        ax.legend(keys, loc=8, bbox_to_anchor=(0.5, -0.40), fontsize='xx-small', ncol=3,
+                fancybox=True).draggable()
         plt.show()
-        fig.savefig('./telenor_is_shit.pdf', orientation='portrait', format='pdf')
-
-
+        fig.savefig('/home/md/Dropbox/Cephios/fioplot/' + self.filename,
+                    orientation='portrait', format='pdf')
 
 
 def main():
