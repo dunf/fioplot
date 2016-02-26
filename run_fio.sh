@@ -69,7 +69,7 @@ sync && echo 3 > /proc/sys/vm/drop_caches
 fio --filename=$filename --direct=1 --rw=read --refill_buffers --ioengine=libaio \
 --bs=256k --iodepth=$depth --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 \
 --write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
---name=$name --output-format=json --output=$name
+--name=$name  > $temp_dir/$name
 
 
 echo "Sequential write bs=256K, no ramp_time"
@@ -80,7 +80,7 @@ sync && echo 3 > /proc/sys/vm/drop_caches
 fio --filename=$filename --direct=1 --rw=write --refill_buffers --ioengine=libaio \
 --bs=256k --iodepth=$depth --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 \
 --write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
---name=$name --output-format=json --output=$name
+--name=$name  > $temp_dir/$name
 
 
 echo "Random read"
@@ -95,7 +95,7 @@ for jobs in 1 16
         --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
         --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
         --write_bw_log=${name}-bwlog \
-        --ramp_time=$ramptime --name=$name --output-format=json --output=$name
+        --ramp_time=$ramptime --name=$name  > $temp_dir/$name
     done
 done
 
@@ -112,7 +112,7 @@ for jobs in 1 16
         --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
         --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
         --write_bw_log=${name}-bwlog \
-        --ramp_time=$ramptime --name=$name --output-format=json --output=$name
+        --ramp_time=$ramptime --name=$name  > $temp_dir/$name
      done
 done
 
@@ -128,6 +128,6 @@ fio --filename=$filename --direct=1 --rw=randrw --refill_buffers --norandommap \
 --randrepeat=0 --ioengine=libaio --bs=8k --rwmixread=70 --iodepth=$depth \
 --unified_rw_reporting=1 --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 \
 --write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
---ramp_time=$ramptime --name=$name --output-format=json --output=$name
+--ramp_time=$ramptime --name=$name  > $temp_dir/$name
 
 exit 0
