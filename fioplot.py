@@ -79,12 +79,11 @@ class Plotter(object):
             '#C0C0C0', '#FFA500', '#A52A2A', '#008000', '#808000', '#E66C2C', '#FCDFFF', '#D462FF',
             '#B5EAAA', '#307D7E', '#7FFFD4'
         ]
-        plt.title('IOPS jlkdsajf lksajf ølkajf fdflksajflkdsa jf lkdsajflkdsajflkdsafjf')       # Using title as xlabel
+        plt.title('IOPS')       # Using title as xlabel
         # plt.xlabel('IOPS')
         fig = plt.figure(1)
         fig.subplots_adjust(left=0.5, bottom=0.35, top=0.92)
         ax = plt.subplot(1,1,1)
-        width=1
         index = 0
         self.results.sort()
         keys = []
