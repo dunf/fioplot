@@ -93,7 +93,6 @@ class Plotter(object):
                 filenameX = os.path.join(dir_with_tests, conf, newest, test[0])
                 time = []
                 values = []
-               # values = zeros(130)
                 present = False
                 try:
                     with open(filename) as file:
@@ -101,16 +100,12 @@ class Plotter(object):
                         for line in file:
                             line_data = line.split(',') # [0] is time, [1] is IOPS
                             time.append(int(line_data[0]))
-                          #  values[j] = int(line_data[1])
-                          #  j += 1
                             values.append(int(line_data[1]))
                     present = True
                 except FileNotFoundError:
                     print("Error!", filename, "not found...")
                     continue
                 tmp = zeros(130)
-             #   dtype=tmp.int
-               # tmp = []
                 last_element = len(time)-1
                 i = 0
                 for j in range(num_jobs):
@@ -151,7 +146,8 @@ class Plotter(object):
             fig = plt.gcf()
             fig.subplots_adjust(bottom=0.4)
             plt.savefig('/home/md/Dropbox/Cephios/fioplot/results_plotter/' + test[0] + '.pdf')
-            print("File " + test[0] + ".pdf saved...")
+            if present == True:
+                print("File " + test[0] + ".pdf saved...")
             print('-' * 30)
             plt.close()
 
