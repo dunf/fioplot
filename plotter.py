@@ -4,13 +4,10 @@
 # Usage: ./plotter -d DIRECTORY
 
 import os
-import sys
-import json
 import argparse
 from matplotlib import pyplot as plt
 import numpy as np
 from numpy import *
-import re
 
 test_type_desc = {
     'fsseqR1-16': 'Seq Read bs=256K, 1 job, IOdepth 16',
@@ -56,20 +53,20 @@ test_type = [       # Array of tuples where the digit is the number of jobs for 
     ('fsmixedRW703016-16', 16),
 ]
 
-# Array contains testing configurations
+# Description of the test config
 test_config = [
     'test1',
-    'test2',
+    'test3',
 ]
-#442.420463039
+
 
 class Args(object):
     parser = argparse.ArgumentParser()
-    parser.add_argument("-d", "--directory", help="Directory where JSON files are located...")
- #   parser.add_argument('-f', '--filename', help='Output filename... Format=pdf', nargs=1, default=None)
+    parser.add_argument("-t", "--testdir", help="Directory where raw data is located...")
+    parser.add_argument('-d', '--destination', help='Destination directory for results', nargs=1)
     args = parser.parse_args()
-    DIR = args.directory
- #   FILENAME = args.filename
+    DIR = args.testdir
+    DESTINATION = args.destination
 
 
 class Plotter(object):
@@ -77,28 +74,80 @@ class Plotter(object):
 
     def do_stuff(self):
         for test in test_type:
-            jobs = test[1]
-
-
+            num_jobs = test[1]
+            index = 0
+            means = []
+            std_dev = []
+            names = []
+            means = zeros(len(test_config))
+            std_dev = zeros(len(test_config))
+            fio_means = zeros(len(test_config))
             for conf in test_config:
-                mypath = os.path.join(self.args.DIR, conf)
-                print(mypath)
-                newest_tmp = sorted(os.listdir(mypath),
-                    key=lambda last_change: os.path.getctime(os.path.join(mypath, last_change)))
-                print(newest_tmp)
+                my_path = os.path.join(self.args.DIR, conf)
+                newest_tmp = sorted(os.listdir(my_path),
+                    key=lambda last_change: os.path.getctime(os.path.join(my_path, last_change)))
                 newest = newest_tmp[-1]
-                print(newest)
-                filename = os.path.join(self.args.DIR, conf, newest, test, '-iopslog_iops.log')
-                print(filename)
-                filenameX = os.path.join(self.args.DIR, conf, newest, test, test)
-                print(filenameX)
+                dir_with_tests = os.path.realpath(self.args.DIR)
+                filename = os.path.join(dir_with_tests, conf, newest, test[0] + '-iopslog_iops.log')
+                filenameX = os.path.join(dir_with_tests, conf, newest, test[0])
                 time = []
                 values = []
-                with open(filename) as file:
-                    for line in file:
-                        linedata = line.split(',') # [0] is time, [1] is IOPS
-
-
+                present = False
+                try:
+                    with open(filename) as file:
+                        j = 0
+                        for line in file:
+                            line_data = line.split(',') # [0] is time, [1] is IOPS
+                            time.append(int(line_data[0]))
+                          #  values[j] = int(line_data[1])
+                          #  j += 1
+                            values.append(int(line_data[1]))
+                    present = True
+                except FileNotFoundError:
+                    print("Error! File ", filename, "not found...")
+                    continue
+                tmp = zeros(120)
+                last_element = len(time)-1
+                i = 0
+                for j in range(num_jobs):
+                    k = 0
+                    while (time[i] <= time[i+1]) and (i < last_element-1):
+                        tmp[k] += values[i]
+                        k += 1
+                        i += 1
+                    tmp[k] += values[i]
+                    i += 1
+                if i == last_element:
+                    tmp[k+1] += values[i]
+                means[index] = tmp.mean()
+                std_dev[index] = tmp.std()
+                try:
+                    with open(filenameX) as file:
+                        total = 0
+                        for line in file:
+                            if 'iops' in line:
+                                iops = int(line.split('iops=')[1].split(',')[0])
+                                total += iops
+                    present = True
+                except FileNotFoundError:
+                    print("Error! File ", filenameX, "not found...")
+                    continue
+                fio_means[index] = total
+                names.append(conf)
+                index += 1
+            ind = np.arange(len(means))
+            width = 0.3
+            rects1 = plt.bar(ind, means, width, color='gray', yerr=std_dev,
+                             error_kw=dict(ecolor='black'))
+            rects2 = plt.bar(ind+width, fio_means, width, color='black')
+            plt.ylabel('IOPS')
+            plt.title(test_type_desc.get(test[0]))
+            plt.xticks(ind+width/2, names, rotation=270)
+            fig = plt.gcf()
+            fig.subplots_adjust(bottom=0.4)
+            print("File " + test[0] + ".pdf saved...")
+            print('-' * 30)
+            plt.close()
 
 
 def main():
