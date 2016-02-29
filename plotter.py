@@ -55,8 +55,9 @@ test_type = [       # Array of tuples where the digit is the number of jobs for 
 
 # Description of the test config
 test_config = [
-    'test1',
-    'test3',
+   # 'test1',
+    #'test3',
+    'ssdjournal',
 ]
 
 
@@ -92,6 +93,7 @@ class Plotter(object):
                 filenameX = os.path.join(dir_with_tests, conf, newest, test[0])
                 time = []
                 values = []
+               # values = zeros(130)
                 present = False
                 try:
                     with open(filename) as file:
@@ -104,13 +106,16 @@ class Plotter(object):
                             values.append(int(line_data[1]))
                     present = True
                 except FileNotFoundError:
-                    print("Error! File ", filename, "not found...")
+                    print("Error!", filename, "not found...")
                     continue
-                tmp = zeros(120)
+                tmp = zeros(130)
+             #   dtype=tmp.int
+               # tmp = []
                 last_element = len(time)-1
                 i = 0
                 for j in range(num_jobs):
                     k = 0
+                    o = 0
                     while (time[i] <= time[i+1]) and (i < last_element-1):
                         tmp[k] += values[i]
                         k += 1
@@ -145,6 +150,7 @@ class Plotter(object):
             plt.xticks(ind+width/2, names, rotation=270)
             fig = plt.gcf()
             fig.subplots_adjust(bottom=0.4)
+            plt.savefig('/home/md/Dropbox/Cephios/fioplot/results_plotter/' + test[0] + '.pdf')
             print("File " + test[0] + ".pdf saved...")
             print('-' * 30)
             plt.close()
