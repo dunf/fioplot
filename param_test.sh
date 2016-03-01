@@ -86,8 +86,8 @@ cd $temp_dir
 echo "Random read"
 for bksize in 4k 8k 16k 32k 64k
   do
-    echo " Doing $jobs jobs with depth $depth"
-    name=fsrandR${jobs}-${depth}
+    echo " Doing jobs with blocksize $bksize"
+    name=fsrandR-${bksize}
     sync && echo 3 > /proc/sys/vm/drop_caches
     fio --filename=$filename --direct=1 --rw=randread --refill_buffers --norandommap \
     --randrepeat=0 --ioengine=libaio --bs=$bksize --iodepth=1 \
@@ -100,8 +100,8 @@ done
 echo "Random write"
 for bksize in 4k 8k 16k 32k 64k
   do
-    echo " Doing $jobs jobs with depth $depth"
-    name=fsrandW${jobs}-${depth}
+    echo " Doing jobs with blocksize $bksize"
+    name=fsrandW${bksize}
     sync && echo 3 > /proc/sys/vm/drop_caches
     fio --filename=$filename --direct=1 --rw=randwrite --refill_buffers --norandommap \
     --randrepeat=0 --ioengine=libaio --bs=$bksize --iodepth=1 \
