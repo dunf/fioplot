@@ -32,11 +32,11 @@ fi
 dirordev=$1
 hw=$2
 testname=$3
-runtime=90   # in seconds
+runtime=60   # in seconds
 ramptime=45   # in seconds
 #filesize=32G  # filesize for fallocate
 
-temp_dir=/data/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
+temp_dir=/media/temp/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
    sub(/^0./, "", s); printf("%X_%X", p, s) }')
 mkdir -p "$temp_dir" || { echo '!! unable to create a tempdir' >&2; \
    temp_dir=; exit 1; }
@@ -84,50 +84,43 @@ cd $temp_dir
 
 
 echo "Random read"
-for jobs in 1 16
+for bksize in 4k 8k 16k 32k 64k
   do
-    for depth in 1 16 32 64
-      do
-        echo " Doing $jobs jobs with depth $depth"
-        name=fsrandR${jobs}-${depth}
-        sync && echo 3 > /proc/sys/vm/drop_caches
-        fio --filename=$filename --direct=1 --rw=randread --refill_buffers --norandommap \
-        --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
-        --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
-        --write_bw_log=${name}-bwlog \
-        --ramp_time=$ramptime --name=$name  > $temp_dir/$name
-    done
+    echo " Doing $jobs jobs with depth $depth"
+    name=fsrandR${jobs}-${depth}
+    sync && echo 3 > /proc/sys/vm/drop_caches
+    fio --filename=$filename --direct=1 --rw=randread --refill_buffers --norandommap \
+    --randrepeat=0 --ioengine=libaio --bs=$bksize --iodepth=1 \
+    --numjobs=1 --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
+    --write_bw_log=${name}-bwlog \
+   --ramp_time=$ramptime --name=$name  > $temp_dir/$name
 done
 
 
 echo "Random write"
-for jobs in 1 16
+for bksize in 4k 8k 16k 32k 64k
   do
-    for depth in 1 16 32 64
-      do
-        echo " Doing $jobs jobs with depth $depth"
-        name=fsrandW${jobs}-${depth}
-        sync && echo 3 > /proc/sys/vm/drop_caches
-        fio --filename=$filename --direct=1 --rw=randwrite --refill_buffers --norandommap \
-        --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
-        --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
-        --write_bw_log=${name}-bwlog \
-        --ramp_time=$ramptime --name=$name  > $temp_dir/$name
-     done
+    echo " Doing $jobs jobs with depth $depth"
+    name=fsrandW${jobs}-${depth}
+    sync && echo 3 > /proc/sys/vm/drop_caches
+    fio --filename=$filename --direct=1 --rw=randwrite --refill_buffers --norandommap \
+    --randrepeat=0 --ioengine=libaio --bs=$bksize --iodepth=1 \
+    --numjobs=1 --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
+    --write_bw_log=${name}-bwlog \
+    --ramp_time=$ramptime --name=$name  > $temp_dir/$name
 done
-
 
 # Combined workload from Storage Review
 # http://www.storagereview.com/fio_flexible_i_o_tester_synthetic_benchmark
-echo "Mixed 70/30 random read and write with 8K block size"
-jobs=16
+#echo "Mixed 70/30 random read and write with 8K block size"
+#jobs=16
 depth=16
-name=fsmixedRW7030${jobs}-${depth}
-sync && echo 3 > /proc/sys/vm/drop_caches
-fio --filename=$filename --direct=1 --rw=randrw --refill_buffers --norandommap \
---randrepeat=0 --ioengine=libaio --bs=8k --rwmixread=70 --iodepth=$depth \
---unified_rw_reporting=1 --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 \
---write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
---ramp_time=$ramptime --name=$name  > $temp_dir/$name
+#name=fsmixedRW7030${jobs}-${depth}
+#sync && echo 3 > /proc/sys/vm/drop_caches
+#fio --filename=$filename --direct=1 --rw=randrw --refill_buffers --norandommap \
+#--randrepeat=0 --ioengine=libaio --bs=8k --rwmixread=70 --iodepth=$depth \
+#--unified_rw_reporting=1 --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 \
+#--write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
+#--ramp_time=$ramptime --name=$name  > $temp_dir/$name
 
 exit 0
