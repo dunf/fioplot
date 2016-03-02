@@ -102,7 +102,6 @@ class Plotter(object):
                 present = False
                 try:
                     with open(filename) as file:
-                        j = 0
                         for line in file:
                             line_data = line.split(',') # [0] is time, [1] is IOPS
                             time.append(int(line_data[0]))
@@ -118,11 +117,11 @@ class Plotter(object):
                 i = 0
                 avg_sum = 0
                 for job in range(num_jobs):
-                    per_job = []
+                    job_values = []
                     while (time[i] <= time[i+1]) and (i < last_element-1):
-                        per_job.append(values[i])
+                        job_values.append(values[i])
                         i += 1
-                    avg_sum += np.mean(per_job)
+                    avg_sum += np.mean(job_values)
 
                     #all_jobs.append(np.mean(per_job))
                     i += 1
