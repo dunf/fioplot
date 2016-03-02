@@ -58,6 +58,9 @@ test_config = [
    # 'test1',
     #'test3',
     'ssdjournal',
+    #'jobs_test',
+    #'qd_test',
+  #  'qd_test_onBlockDev'
 ]
 
 
@@ -79,11 +82,14 @@ class Plotter(object):
             index = 0
             means = []
             std_dev = []
+            fio_means = []
             names = []
-            means = zeros(len(test_config))
-            std_dev = zeros(len(test_config))
-            fio_means = zeros(len(test_config))
+            means = zeros(len(test_config))            # No bueno
+            #std_dev = zeros(len(test_config))          # No bueno
+            #fio_means = zeros(len(test_config))        # No bueno
+
             for conf in test_config:
+                print("Processing test:", conf, "---- File: ", test[0])
                 my_path = os.path.join(self.args.DIR, conf)
                 newest_tmp = sorted(os.listdir(my_path),
                     key=lambda last_change: os.path.getctime(os.path.join(my_path, last_change)))
@@ -105,22 +111,48 @@ class Plotter(object):
                 except FileNotFoundError:
                     print("Error!", filename, "not found...")
                     continue
-                tmp = zeros(130)
+#
+#-------------------- NEW -------------------------------------
+                all_jobs = []
                 last_element = len(time)-1
                 i = 0
-                for j in range(num_jobs):
-                    k = 0
-                    o = 0
+                avg_sum = 0
+                for job in range(num_jobs):
+                    per_job = []
                     while (time[i] <= time[i+1]) and (i < last_element-1):
-                        tmp[k] += values[i]
-                        k += 1
+                        per_job.append(values[i])
                         i += 1
-                    tmp[k] += values[i]
+                    avg_sum += np.mean(per_job)
+
+                    #all_jobs.append(np.mean(per_job))
                     i += 1
-                if i == last_element:
-                    tmp[k+1] += values[i]
-                means[index] = tmp.mean()
-                std_dev[index] = tmp.std()
+                print("Sum avg IOPS: ", avg_sum)
+
+# ------------------------------ # ERIKS LØSNING ----------------------------------------
+#                i = 0
+#                tmp = zeros(130)
+#                last_element = len(time)-1
+#                for j in range(num_jobs):
+#                    k = 0
+#                    while (time[i] <= time[i+1]) and (i < last_element-1):
+#                        tmp[k] += values[i]
+#                        k += 1
+#                        i += 1
+#                    tmp[k] += values[i]
+#                    i += 1
+#                if i == last_element:
+#                    tmp[k+1] += values[i]
+
+# -----------------------------------------------------------------------
+              #  print(tmp)
+        #        means.append(np.mean(all_jobs))
+
+               # print("AVG: ", tmp.mean())
+#                print("StdDev: ", tmp.std())
+#                print("AVG: ", np.mean(tmp))
+            #    std_dev[index] = np.std(tmp)
+                means[index] = avg_sum         #tmp.mean()
+              #  print("StdDev: ", np.std(tmp))
                 try:
                     with open(filenameX) as file:
                         total = 0
@@ -132,17 +164,20 @@ class Plotter(object):
                 except FileNotFoundError:
                     print("Error! File ", filenameX, "not found...")
                     continue
-                fio_means[index] = total
+                print("FIO IOPS: ", total)
+        #        fio_means[index] = total
+                fio_means.append(total)
                 names.append(conf)
                 index += 1
             ind = np.arange(len(means))
             width = 0.3
-            rects1 = plt.bar(ind, means, width, color='gray', yerr=std_dev,
+            rects1 = plt.bar(ind, means, width, color='gray', #yerr=std_dev,
                              error_kw=dict(ecolor='black'))
-            rects2 = plt.bar(ind+width, fio_means, width, color='black')
+            rects2 = plt.bar(ind+width, fio_means, width, color='brown')
             plt.ylabel('IOPS')
             plt.title(test_type_desc.get(test[0]))
             plt.xticks(ind+width/2, names, rotation=270)
+           # plt.text(ind+0.45, fio_means+50, fio_means, ha='center')
             fig = plt.gcf()
             fig.subplots_adjust(bottom=0.4)
             plt.savefig('/home/md/Dropbox/Cephios/fioplot/results_plotter/' + test[0] + '.pdf')

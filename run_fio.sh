@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# fio.bash /my_test_Dir_or_Device hw testname
+# fio.bash /my_test_Dir_or_Device hw testname dest_dir
 
 # all data is stored in a /data directory which should exist
 
@@ -32,15 +32,21 @@ fi
 dirordev=$1
 hw=$2
 testname=$3
+dest_dir=$4
 runtime=120   # in seconds
 ramptime=60   # in seconds
 #filesize=32G  # filesize for fallocate
 
-temp_dir=/data/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
-   sub(/^0./, "", s); printf("%X_%X", p, s) }')
-mkdir -p "$temp_dir" || { echo '!! unable to create a tempdir' >&2; \
-   temp_dir=; exit 1; }
 
+if [[ "$dest_dir" ne '' ]]; then
+  temp_dir=/${dest_dir}/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
+   sub(/^0./, "", s); printf("%X_%X", p, s) }')
+  mkdir -p "$temp_dir" || { echo '!! unable to create a tempdir' >&2; \
+     temp_dir=; exit 1; }
+else
+  temp_dir=/data/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
+ 43    sub(/^0./, "", s); printf("%X_%X", p, s) }')
+fi
 if [[ -d $dirordev ]]; then
   cd $dirordev
   # create huge file to test against

@@ -57,7 +57,10 @@ numtesttype = [
 ]
 # these are the architectures to include
 numtestarch = [
-    'S3500',
+    #'test1',
+    #'test3',
+    'ssdjournal'
+ #   'S3500',
 #    'S3500-dwc',
 ##    'S3500-ext4-nojournal',
 ##    'S3500-ext4',
@@ -65,24 +68,24 @@ numtestarch = [
 #    'S3700',
 ##    'S3700-dwc',
  #   'S3700-ext4-nojournal',
-    'S3700-ext4',
-    'S3700-xfs',
-    'WDRed',
-    'WDRed-dwc',
-    'WDRed-ext4-nojournal',
-    'WDRed-ext4',
-    'WDRed-xfs',
-    'RAID5',
-    'RAID5-dwc',
-    'RAID5-ctrlcache',
+    #'S3700-ext4',
+    #'S3700-xfs',
+    #'WDRed',
+    #'WDRed-dwc',
+    #'WDRed-ext4-nojournal',
+    #'WDRed-ext4',
+    #'WDRed-xfs',
+    #'RAID5',
+    #'RAID5-dwc',
+    #'RAID5-ctrlcache',
 #    'bcache-RAID10-xfs-noatime',
-    'bcache-RAID10',
-    'bcache-RAID10-dwc',
-    'bcache-RAID10-ctrlcache',
-    'bcache-RAID10-dwc-ctrlcache',
-    'RAID10',
-    'RAID10-dwc',
-    'RAID10-ctrlcache',
+    #'bcache-RAID10',
+    #'bcache-RAID10-dwc',
+    #'bcache-RAID10-ctrlcache',
+    #'bcache-RAID10-dwc-ctrlcache',
+    #'RAID10',
+    #'RAID10-dwc',
+    #'RAID10-ctrlcache',
 #    'bcache-RAID10-ext4-nojournal',
 #    'bcache-RAID10-ext4',
 #    'bcache-RAID10-xfs',
@@ -94,14 +97,14 @@ numtestarch = [
 #    'bcache-RAID5-xfs-nobarrier',
 #    'bcache-RAID5-xfs-noatime',
 #    'bcache-RAID5-xfs-nobarrier-noatime',
-    'bcache-RAID5',
-    'bcache-RAID5-dwc',
+    #'bcache-RAID5',
+    #'bcache-RAID5-dwc',
 ##    'bcache-RAID5-ctrlcache',
-    'bcache-RAID5-dwc-ctrlcache',
-    'native-fusemount',
-    'vm-fusemount-ext4',
-    'vm-gfapi-dev',
-    'vm-gfapi-ext4',
+    #'bcache-RAID5-dwc-ctrlcache',
+    #'native-fusemount',
+    #'vm-fusemount-ext4',
+    #'vm-gfapi-dev',
+    #'vm-gfapi-ext4',
 ]
 
 #f = open('/home/erikh/Desktop/PERF-CAP/results/tex/out.tex','w')
@@ -112,15 +115,15 @@ for tk in numtesttype:  # SKIP ALL SEQ/MIXED FOR NOW SINCE BW NOT IOPS THERE
     if re.search(r"rand", tk):
         jobs = int(re_dig.search(tk).group(0))
     elif tk == 'fsmixedRW703016-16':
-        #jobs = 16
+      #  jobs = 16
         continue
     else:
         #jobs = 1
         continue
-    print(jobs)
-    means = zeros (len(numtestarch))
-    stds = zeros (len(numtestarch))
-    fiomeans = zeros (len(numtestarch))
+    print("Jobs: ", jobs)
+    means = zeros (len(numtestarch))        # nope
+    stds = zeros (len(numtestarch))         # nope
+    fiomeans = zeros (len(numtestarch))     # nope
     idx = 0
 #    dirty = []
     names = []
@@ -141,13 +144,17 @@ for tk in numtesttype:  # SKIP ALL SEQ/MIXED FOR NOW SINCE BW NOT IOPS THERE
 #                    dirty.append(float(line))
         # read iops numbers and compute mean and std dev:
         filename = sys.argv[1] + ak + '/' + newest + '/' + tk + '-iopslog_iops.log'
-        filenameX = sys.argv[1] + ak + '/' + newest + '/' + tk # fio's own number also 
-        time = np.loadtxt(filename,delimiter=', ',usecols=(0,))
-        value = np.loadtxt(filename,delimiter=', ',usecols=(1,))
+        filenameX = sys.argv[1] + ak + '/' + newest + '/' + tk # fio's own number also
+        try:
+            time = np.loadtxt(filename, delimiter=', ', usecols=(0,))
+            value = np.loadtxt(filename, delimiter=', ', usecols=(1,))
+        except FileNotFoundError:
+            print("Error! File " + tk + " not found...")
+            continue
         tmp = zeros(120)
         lastelement = len(time)-1
-        print(filename)
-        print(lastelement)
+        print("Filename: ", filename)
+  #      print(lastelement)
         i = 0
         for j in range(jobs):
             k = 0
@@ -159,10 +166,12 @@ for tk in numtesttype:  # SKIP ALL SEQ/MIXED FOR NOW SINCE BW NOT IOPS THERE
             i += 1
         if i == lastelement:
             tmp[k+1] += value[i]
-        print(i)
-        print(tmp.mean(), tmp.std())
+        print(tmp)
+        print("Len tmp: ", len(tmp))
+
         means[idx] = tmp.mean()
         stds[idx] = tmp.std()
+        print("Avg: ", tmp.mean(), "StdDev: ",  tmp.std())
         names.append(ak)
         # get fios own iops value
         temp = []
@@ -173,17 +182,18 @@ for tk in numtesttype:  # SKIP ALL SEQ/MIXED FOR NOW SINCE BW NOT IOPS THERE
                     temp.append(m.group(1))
         fiomeans[idx] = sum([float(a) for a in temp]) # sum these iops values
         idx += 1                                   # increase index for means, std, fiomeans
+        print("-" * 99)
     # IOPS plot:
     ind = np.arange(len(means))
     width = 0.3 
-    rects1 = plt.bar(ind,means,width,color='gray',yerr=stds,error_kw=dict(ecolor='black'))
-    rects2 = plt.bar(ind+width,fiomeans,width,color='black')
+    rects1 = plt.bar(ind, means, width, color='gray', yerr=stds, error_kw=dict(ecolor='black'))
+    rects2 = plt.bar(ind+width, fiomeans, width, color='black')
     plt.ylabel('IOPS')
     plt.title(testtype[tk])
     plt.xticks(ind+width/2, names, rotation=270)
     fig = plt.gcf()
     fig.subplots_adjust(bottom=0.4)
-    plt.savefig('/home/md/Dropbox/Cephios/fioplot/results/' + tk + '.pdf')
+    plt.savefig('/home/md/Dropbox/Cephios/fioplot/results_plotsintex/' + tk + '.pdf')
     plt.close()
 #    f.write('\\includegraphics[width=0.9\\textwidth]{/home/erikh/Desktop/PERF-CAP/results/figs/' + tk + '.pdf} \\\\ \n')
     # dirty_data plot if available:

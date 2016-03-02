@@ -38,14 +38,14 @@ ramptime=45   # in seconds
 #filesize=32G  # filesize for fallocate
 
 
-if [[ "$dest_dir" ne '' ]]; then
-  temp_dir=/${dest_dir}/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
-   sub(/^0./, "", s); printf("%X_%X", p, s) }')
-  mkdir -p "$temp_dir" || { echo '!! unable to create a tempdir' >&2; \
-     temp_dir=; exit 1; }
+if [ "$dest_dir" != '' ]; then
+	temp_dir=/${dest_dir}/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
+ 	sub(/^0./, "", s); printf("%X_%X", p, s) }')
+	mkdir -p "$temp_dir" || { echo '!! unable to create a tempdir' >&2; temp_dir=; exit 1; }
 else
-  temp_dir=/data/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
- 43    sub(/^0./, "", s); printf("%X_%X", p, s) }')
+  	temp_dir=/data/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
+	sub(/^0./, "", s); printf("%X_%X", p, s) }')
+	mkdir -p "$temp_dir" || { echo '!! unable to create a tempdir' >&2; temp_dir=; exit 1; }
 fi
 
 if [[ -d $dirordev ]]; then
@@ -67,7 +67,7 @@ fi
 
 cd $temp_dir
 
-for jobs in 1 16 32 64 128
+for jobs in 1 16 32
   do
     for depth in 1 # 16 32 64
       do
@@ -77,14 +77,14 @@ for jobs in 1 16 32 64 128
         fio --filename=$filename --direct=1 --rw=randread --refill_buffers --norandommap \
         --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
         --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
-        --write_bw_log=${name}-bwlog \
+        --write_bw_log=${name}-bwlog --iopsavgtime=1000 --group_reporting \
         --ramp_time=$ramptime --name=$name  > $temp_dir/$name
     done
 done
 
 
 echo "Random write"
-for jobs in 1 16 32 64 128
+for jobs in 1 16 32
   do
     for depth in 1 #16 32 64
       do
@@ -94,7 +94,7 @@ for jobs in 1 16 32 64 128
         fio --filename=$filename --direct=1 --rw=randwrite --refill_buffers --norandommap \
         --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
         --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 --write_iops_log=${name}-iopslog \
-        --write_bw_log=${name}-bwlog \
+        --write_bw_log=${name}-bwlog --iopsavgtime=1000 --group_reporting \
         --ramp_time=$ramptime --name=$name  > $temp_dir/$name
      done
 done
