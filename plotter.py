@@ -7,13 +7,11 @@
 
 # Author: Mihkal Dunfjeld
 
-#
-
 import os
 import argparse
 from matplotlib import pyplot as plt
 import numpy as np
-#from numpy import *
+
 
 test_type_desc = {      # Dict used for titles in diagrams
     'fsseqR1-16': 'Seq Read bs=256K, 1 job, IOdepth 16',
@@ -37,10 +35,11 @@ test_type_desc = {      # Dict used for titles in diagrams
     'fsmixedRW703016-16': 'Mixed RW 70/30 bs=8K, 16 jobs, IOdepth 16',
 }
 
-test_type = [               # Array of tuples where the digit is the number of jobs for each test
-    ('fsseqR1-16', 1),      # When adding a new test, the naming convention is as follows:
-    ('fsseqW1-16', 1),      # fs + rand/seq/mixed + (R)ead/(W)rite + number of jobs + - + IO depth
-    ('fsrandR1-1', 1),      #
+# Array of tuples that specify the files and number of jobs for each test.
+test_type = [               # Naming convention:
+    ('fsseqR1-16', 1),      # fs + rand/seq/mixed + (R)ead/(W)rite + number of jobs + - + IO depth
+    ('fsseqW1-16', 1),
+    ('fsrandR1-1', 1),
     ('fsrandR1-16', 1),
 	('fsrandR1-32', 1),
 	('fsrandR1-64', 1),
@@ -77,8 +76,7 @@ class Args(object):
 
 class Plotter(object):
     args = Args()
-    test_data = []  # (file, config, stdDev, raw iops, fio iops)
-    def do_stuff(self):
+    def create_barchart(self):
         for test in test_type:
             num_jobs = test[1]
             index = 0
@@ -114,8 +112,6 @@ class Plotter(object):
                 except FileNotFoundError:
                     print("Error!", raw_file, "not found...")
                     continue
-#
-#-------------------- NEW -------------------------------------
                 std_dev.append(np.std(values))
                 i = 0
                 raw_iops_sum = 0
@@ -180,7 +176,7 @@ class Plotter(object):
 def main():
     p = Plotter()
     if p.args.DIR:
-        p.do_stuff()
+        p.create_barchart()
 
 
 if __name__ == "__main__":
