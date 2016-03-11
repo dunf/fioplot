@@ -15,50 +15,28 @@ import numpy as np
 import test_config
 
 
-test_type_desc = {      # Dict used for titles in diagrams
-    'fsseqR1-16': 'Seq Read bs=256K, 1 job, IOdepth 16',
-    'fsseqW1-16': 'Seq Write bs=256K 1 job, IOdepth 16',
-	'fsrandR1-1': 'Random Read 1 jobs, IOdepth 1',
-	'fsrandR1-16': 'Random Read 1 jobs, IOdepth 16',
-	'fsrandR1-32': 'Random Read 1 jobs, IOdepth 32',
-	'fsrandR1-64': 'Random Read 1 jobs, IOdepth 64',
-	'fsrandR16-1': 'Random Read 16 jobs, IOdepth 1',
-	'fsrandR16-16': 'Random Read 16 jobs, IOdepth 16',
-	'fsrandR16-32': 'Random Read 16 jobs, IOdepth 32',
-	'fsrandR16-64': 'Random Read 16 jobs, IOdepth 64',
-	'fsrandW1-1': 'Random Write 1 jobs, IOdepth 1',
-	'fsrandW1-16': 'Random Write 1 jobs, IOdepth 16',
-	'fsrandW1-32': 'Random Write 1 jobs, IOdepth 32',
-	'fsrandW1-64': 'Random Write 1 jobs, IOdepth 64',
-	'fsrandW16-1': 'Random Write 16 jobs, IOdepth 1',
-	'fsrandW16-16': 'Random Write 16 jobs, IOdepth 16',
-	'fsrandW16-32': 'Random Write 16 jobs, IOdepth 32',
-	'fsrandW16-64': 'Random Write 16 jobs, IOdepth 64',
-    'fsmixedRW703016-16': 'Mixed RW 70/30 bs=8K, 16 jobs, IOdepth 16',
-}
-
 # Array of tuples that specify the files and number of jobs for each test.
-# Naming convention: fs + rand/seq/mixed + (R)ead/(W)rite + number of jobs + - + IO depth
+# Format: short testname, number of jobs, test description
 test_type = [
-    ('fsseqR1-16', 1),
-    ('fsseqW1-16', 1),
-    ('fsrandR1-1', 1),
-    ('fsrandR1-16', 1),
-	('fsrandR1-32', 1),
-	('fsrandR1-64', 1),
-	('fsrandR16-1', 16),
-	('fsrandR16-16', 16),
-	('fsrandR16-32', 16),
-	('fsrandR16-64', 16),
-	('fsrandW1-1', 1),
-	('fsrandW1-16', 1),
-	('fsrandW1-32', 1),
-	('fsrandW1-64', 1),
-	('fsrandW16-1', 16),
-	('fsrandW16-16', 16),
-	('fsrandW16-32', 16),
-	('fsrandW16-64', 16),
-    ('fsmixedRW703016-16', 16),
+    ('fsseqR1-16', 1, 'Seq Read bs=256K, 1 job, IOdepth 16'),
+    ('fsseqW1-16', 1, 'Seq Write bs=256K 1 job, IOdepth 16'),
+    ('fsrandR1-1', 1, 'Random Read 1 jobs, IOdepth 1'),
+    ('fsrandR1-16', 1, 'Random Read 1 jobs, IOdepth 16'),
+	('fsrandR1-32', 1, 'Random Read 1 jobs, IOdepth 32'),
+	('fsrandR1-64', 1, 'Random Read 1 jobs, IOdepth 64'),
+	('fsrandR16-1', 16, 'Random Read 16 jobs, IOdepth 1'),
+	('fsrandR16-16', 16, 'Random Read 16 jobs, IOdepth 16'),
+	('fsrandR16-32', 16, 'Random Read 16 jobs, IOdepth 32'),
+	('fsrandR16-64', 16, 'Random Read 16 jobs, IOdepth 64'),
+	('fsrandW1-1', 1, 'Random Write 1 jobs, IOdepth 1'),
+	('fsrandW1-16', 1, 'Random Write 1 jobs, IOdepth 16'),
+	('fsrandW1-32', 1, 'Random Write 1 jobs, IOdepth 32'),
+	('fsrandW1-64', 1, 'Random Write 1 jobs, IOdepth 64'),
+	('fsrandW16-1', 16, 'Random Write 16 jobs, IOdepth 1'),
+	('fsrandW16-16', 16, 'Random Write 16 jobs, IOdepth 16'),
+	('fsrandW16-32', 16, 'Random Write 16 jobs, IOdepth 32'),
+	('fsrandW16-64', 16, 'Random Write 16 jobs, IOdepth 64'),
+    ('fsmixedRW703016-16', 16, 'Mixed RW 70/30 bs=8K, 16 jobs, IOdepth 16'),
 ]
 
 
@@ -88,7 +66,7 @@ class Plotter(object):
           #  fio_means = zeros(len(test_config))        # No bueno
 
             for conf in self.configs:
-                print("Processing test:", conf, "---- File: ", test[0])
+                print("Test: ", test[2], "---- Configuration: ", conf)
                 my_path = os.path.join(self.args.DIR, conf)
                 newest_tmp = sorted(os.listdir(my_path),
                     key=lambda last_change: os.path.getctime(os.path.join(my_path, last_change)))
@@ -161,14 +139,15 @@ class Plotter(object):
             plt.bar(ind, means, width, color='gray', yerr=std_dev, error_kw=dict(ecolor='black'))
             plt.bar(ind+width, fio_means, width, color='green')
             plt.ylabel('IOPS')
-            plt.title(test_type_desc.get(test[0]))
+            plt.title(test[2])
+         #   plt.title(test_type_desc.get(test[0]))
             plt.xticks(ind+width/2, names, rotation=270)
             fig = plt.gcf()
             fig.subplots_adjust(bottom=0.4)
             plt.savefig('/home/md/Dropbox/Cephios/fioplot/results_plotter/' + test[0] + '.pdf')
             if file_exists is True:
                 print("File " + test[0] + ".pdf saved...")
-            print('-' * 80)
+            print('-' * 90)
             plt.close()
 
 
