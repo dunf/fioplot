@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# This is a fork of Erik Hjelmås' plotsintex script.
+# This is a fork of Erik HjelmÃ¥s' plotsintex script.
 # Usage: ./plotter -t DIRECTORY
 # The directories needs to follow this structure:
 # DIRECTORY/SomeConfiguration/RandomGeneratedFolder/fiofiles
@@ -60,8 +60,12 @@ test_type = [               # Naming convention:
 
 # Description of the test config.
 test_config = [
-    'Journal on SSD filesystem',
-    'Journal on SSD blockdevice'
+    'JournalonSSDfilesystem',
+#    'JournalonSSDblockdevice',
+    'BaseTest_SAS_disks',
+    'SAS_disks_MaxSync_1',
+    'SAS_disks_MaxSync_10',
+    'MaxSync_10_Run_2',
 ]
 
 
@@ -120,10 +124,11 @@ class Plotter(object):
                     while (time[i] <= time[i+1]): #and (i < last_element-1):
                         job_values.append(values[i])
                         i += 1
+                    job_values.append(values[i])
                     raw_iops_sum += np.mean(job_values)
                     i += 1
 
-# ------------------------------ # ERIKS LØSNING --------------------------------------------------
+# ------------------------------ # ERIKS LÃ˜SNING --------------------------------------------------
 #                i = 0
 #                tmp = zeros(130)
 #                last_element = len(time)-1
@@ -150,9 +155,9 @@ class Plotter(object):
                 except FileNotFoundError:
                     print("Error! File ", fio_output, "not found...")
                     continue
-                print("RAW IOPS: ", raw_iops_sum)
-                print("FIO IOPS: ", iops_sum)
-                print("Standard deviation: ", std_dev[index])
+                print(" " * 2, "RAW IOPS: ", raw_iops_sum)
+                print(" " * 2, "FIO IOPS: ", iops_sum)
+                print(" " * 2, "Standard deviation: ", std_dev[index])
                 means.append(raw_iops_sum)
                 fio_means.append(iops_sum)
                 names.append(conf)
