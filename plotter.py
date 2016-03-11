@@ -4,6 +4,7 @@
 # Usage: ./plotter -t DIRECTORY
 # The directories needs to follow this structure:
 # DIRECTORY/SomeConfiguration/RandomGeneratedFolder/fiofiles
+# Add additional test configurations to test_config.py
 
 # Author: Mihkal Dunfjeld
 
@@ -11,6 +12,7 @@ import os
 import argparse
 from matplotlib import pyplot as plt
 import numpy as np
+import test_config
 
 
 test_type_desc = {      # Dict used for titles in diagrams
@@ -36,8 +38,9 @@ test_type_desc = {      # Dict used for titles in diagrams
 }
 
 # Array of tuples that specify the files and number of jobs for each test.
-test_type = [               # Naming convention:
-    ('fsseqR1-16', 1),      # fs + rand/seq/mixed + (R)ead/(W)rite + number of jobs + - + IO depth
+# Naming convention: fs + rand/seq/mixed + (R)ead/(W)rite + number of jobs + - + IO depth
+test_type = [
+    ('fsseqR1-16', 1),
     ('fsseqW1-16', 1),
     ('fsrandR1-1', 1),
     ('fsrandR1-16', 1),
@@ -58,16 +61,6 @@ test_type = [               # Naming convention:
     ('fsmixedRW703016-16', 16),
 ]
 
-# Description of the test config.
-test_config = [
-    'JournalonSSDfilesystem',
-#    'JournalonSSDblockdevice',
-    'BaseTest_SAS_disks',
-    'SAS_disks_MaxSync_1',
-    'SAS_disks_MaxSync_10',
-    'MaxSync_10_Run_2',
-]
-
 
 class Args(object):
     parser = argparse.ArgumentParser()
@@ -80,6 +73,7 @@ class Args(object):
 
 class Plotter(object):
     args = Args()
+    configs = test_config.Config.configurations
     def create_barchart(self):
         for test in test_type:
             num_jobs = test[1]
@@ -93,7 +87,7 @@ class Plotter(object):
           #  std_dev = zeros(len(test_config))          # No bueno
           #  fio_means = zeros(len(test_config))        # No bueno
 
-            for conf in test_config:
+            for conf in self.configs:
                 print("Processing test:", conf, "---- File: ", test[0])
                 my_path = os.path.join(self.args.DIR, conf)
                 newest_tmp = sorted(os.listdir(my_path),
