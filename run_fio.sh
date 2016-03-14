@@ -65,7 +65,8 @@ fi
 
 
 cd $temp_dir
-
+starttime=$(date +"%s")
+echo "Cephios testsuite started at $(date +"%T")"
 
 echo "Sequential read bs=256K, no ramp_time"
 jobs=1
@@ -135,5 +136,10 @@ fio --filename=$filename --direct=1 --rw=randrw --refill_buffers --norandommap \
 --unified_rw_reporting=1 --numjobs=$jobs --runtime=$runtime --log_avg_msec=1000 \
 --write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
 --ramp_time=$ramptime --name=$name  > $temp_dir/$name
+
+echo "Cephios testsuite finished at $(date +"%T")"
+finishtime=$(date +"%s")
+elapsed=$((finishtime-starttime))
+echo "Testsuite took $(($elapsed/60)) and $((elapsed%60)) seconds..."
 
 exit 0
