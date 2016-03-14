@@ -38,7 +38,7 @@ ramptime=60   # in seconds
 #filesize=32G  # filesize for fallocate
 
 
-if [[ "$dest_dir" ne '' ]]; then
+if [[ -z $dest_dir" ]]; then
   temp_dir=/${dest_dir}/${hw}/${testname}/$(awk -v p=$$ 'BEGIN { srand(); s = rand(); \
    sub(/^0./, "", s); printf("%X_%X", p, s) }')
   mkdir -p "$temp_dir" || { echo '!! unable to create a tempdir' >&2; \
@@ -140,6 +140,6 @@ fio --filename=$filename --direct=1 --rw=randrw --refill_buffers --norandommap \
 echo "Cephios testsuite finished at $(date +"%T")"
 finishtime=$(date +"%s")
 elapsed=$((finishtime-starttime))
-echo "Testsuite took $(($elapsed/60)) and $((elapsed%60)) seconds..."
+echo "Testsuite took $(($elapsed/60)) minutes and $((elapsed%60)) seconds..."
 
 exit 0
