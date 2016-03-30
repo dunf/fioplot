@@ -78,7 +78,7 @@ name=fsseqR${jobs}-${depth}
 sync && echo 3 > /proc/sys/vm/drop_caches
 fio --filename=$filename --direct=1 --rw=read --refill_buffers --ioengine=libaio \
 --bs=256k --iodepth=$depth --numjobs=$jobs --runtime=$runtime  \
---write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
+--write_iops_log=${name}-iopslog --log_avg_msec=1000 \
 --name=$name  > $temp_dir/$name
 
 
@@ -89,7 +89,7 @@ name=fsseqW${jobs}-${depth}
 sync && echo 3 > /proc/sys/vm/drop_caches
 fio --filename=$filename --direct=1 --rw=write --refill_buffers --ioengine=libaio \
 --bs=256k --iodepth=$depth --numjobs=$jobs --runtime=$runtime \
---write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
+--write_iops_log=${name}-iopslog --log_avg_msec=1000 \
 --name=$name  > $temp_dir/$name
 
 
@@ -104,7 +104,7 @@ for jobs in 1 16
         fio --filename=$filename --direct=1 --rw=randread --refill_buffers --norandommap \
         --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
         --numjobs=$jobs --runtime=$runtime --write_iops_log=${name}-iopslog \
-        --write_bw_log=${name}-bwlog \
+        --log_avg_msec=1000 \
         --ramp_time=$ramptime --name=$name  > $temp_dir/$name
     done
 done
@@ -121,7 +121,7 @@ for jobs in 1 16
         fio --filename=$filename --direct=1 --rw=randwrite --refill_buffers --norandommap \
         --randrepeat=0 --ioengine=libaio --bs=4k --iodepth=$depth \
         --numjobs=$jobs --runtime=$runtime --write_iops_log=${name}-iopslog \
-        --write_bw_log=${name}-bwlog \
+        --log_avg_msec=1000 \
         --ramp_time=$ramptime --name=$name  > $temp_dir/$name
      done
 done
@@ -137,7 +137,7 @@ sync && echo 3 > /proc/sys/vm/drop_caches
 fio --filename=$filename --direct=1 --rw=randrw --refill_buffers --norandommap \
 --randrepeat=0 --ioengine=libaio --bs=8k --rwmixread=70 --iodepth=$depth \
 --unified_rw_reporting=1 --numjobs=$jobs --runtime=$runtime \
---write_iops_log=${name}-iopslog --write_bw_log=${name}-bwlog \
+--write_iops_log=${name}-iopslog --log_avg_msec=1000 \
 --ramp_time=$ramptime --name=$name  > $temp_dir/$name
 
 echo "Cephios testsuite finished at $(date +"%T")"
