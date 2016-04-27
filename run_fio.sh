@@ -140,6 +140,11 @@ fio --filename=$filename --direct=1 --rw=randrw --refill_buffers --norandommap \
 --write_iops_log=${name}-iopslog --log_avg_msec=1000 \
 --ramp_time=$ramptime --name=$name  > $temp_dir/$name
 
+p=$(pwd)
+cd $tempdir
+bash gnuplot.sh $3
+cd $p
+
 echo "Cephios testsuite finished at $(date +"%T")"
 finishtime=$(date +"%s")
 elapsed=$((finishtime-starttime))
