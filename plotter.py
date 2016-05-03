@@ -55,7 +55,7 @@ class Plotter(object):
 #        except Exception:
  #           print("Error! Config not found...")
 
-
+# hei
     def create_barchart(self):
         for test in self.test_type:
             num_jobs = test[1]
