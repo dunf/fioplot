@@ -70,14 +70,28 @@ class Plotter(object):
                     continue
                 i = 0
                 raw_iops_avg = 0
-                for job in range(test[1]):  # Test[1] = number of jobs
-                    job_values = []
-                    while time[i] <= time[i+1]:
-                        job_values.append(values[i])
-                        i += 1
-                    job_values.append(values[i])
-                    raw_iops_avg += numpy.mean(job_values)
-                    i += 1
+             #   for job in range(test[1]):  # Test[1] = number of jobs
+             #       job_values = []
+             #       while time[i] <= time[i+1]:
+             #           job_values.append(values[i])
+             #           i += 1
+             #       job_values.append(values[i])
+             #       raw_iops_avg += numpy.mean(job_values)
+             #       i += 1
+
+                pre = 0
+                jv = []
+                k = 0
+                for t, v in zip(time, values):
+                    if pre <= t:
+                        jv.append(values[k])
+                        k += 1
+                        pre = t
+                    else:
+                        raw_iops_avg += numpy.mean(jv)
+                        jv.append(values[k])
+                        k += 1
+
                 # Tuple containing test data are added to an array
                 self.test_objects.append((conf, test[0], raw_iops_avg, iops_sum))
 
