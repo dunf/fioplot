@@ -4,7 +4,7 @@
 # Usage: ./plotter -t DIRECTORY
 # The directories needs to follow this structure:
 # DIRECTORY/SomeConfiguration/RandomGeneratedFolder/fiofiles
-# Add additional test configurations to test_config.py
+# Add additional test configurations to plotter_config.py
 
 # Author: Mihkal Dunfjeld
 # Repository: https://bitbucket.org/dunf/fioplot/src/
@@ -27,7 +27,6 @@ class Args(object):
     args = parser.parse_args()
     DIR = args.testdir
     DESTINATION = args.destination
-    HIST_DIR = args.histogram
 
 
 class Plotter(object):
@@ -44,7 +43,6 @@ class Plotter(object):
             std_dev = []
             fio_means = []
             names = []
-            t1 = []
             for conf in self.configs:
                 print("Test: ", test[2], "---- Configuration: ", conf)
                 my_path = os.path.join(self.args.DIR, conf)
