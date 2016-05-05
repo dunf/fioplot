@@ -22,8 +22,6 @@ class Args(object):
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--testdir", help="Generate barchart for all test configurations")
     parser.add_argument('-d', '--destination', help='Destination dir for output files', nargs=1)
-    parser.add_argument('-r', '--histogram', nargs=1,
-                        help='Dir in which you want to generate histograms')
     args = parser.parse_args()
     DIR = args.testdir
     DESTINATION = args.destination
@@ -64,7 +62,7 @@ class Plotter(object):
                     file_exists = True
                     time.append(0)
                 except FileNotFoundError:
-                    print("Error!", raw_file, "not found...")
+#                    print("Error!", raw_file, "not found...")
                     continue
                 std_dev.append(numpy.std(values))
                 i = 0
@@ -86,7 +84,7 @@ class Plotter(object):
                                 iops_sum += iops
                     file_exists = True
                 except FileNotFoundError:
-                    print("Error! File ", fio_output, "not found...")
+#                    print("Error! File ", fio_output, "not found...")
                     continue
                 print(" " * 2, "FIO IOPS: ", iops_sum)
                 print(" " * 2, "RAW IOPS: ", raw_iops_avg)
@@ -111,8 +109,11 @@ class Plotter(object):
             fig = plt.gcf()
             fig.subplots_adjust(top=0.95)
             fig.subplots_adjust(bottom=0.4)
-            plt.savefig('/home/' + pwd.getpwuid(os.getuid()).pw_name +
-                        '/Dropbox/Cephios/fioplot/results/' + test[0] + '.pdf')
+            if self.args.DESTINATION:
+                plt.savefig(self.args.DESTINATION[0] + '/' + test[0] + '.pdf')
+            else:
+                plt.savefig('/home/' + pwd.getpwuid(os.getuid()).pw_name +
+                            '/Dropbox/Cephios/fioplot/results/' + test[0] + '.pdf')
             if file_exists is True:
                 print("File " + test[0] + ".pdf saved...")
             print('-' * 90)
