@@ -3,7 +3,7 @@
 class Config(object):
     configurations = [
 #        'Samsung 840 EVO',        # SSD baseline test
-#        'BaselineSSD',           # Full run på dozer
+        'BaselineSSD',           # Full run på dozer
 #        'Samsung 840 disk1',               # baseSSDapoc
 #        'Samsung 840 disk2',              # baseSSDdozer
 #        'Samsung 840 disk3',             # baseSSDswitch
@@ -11,9 +11,9 @@ class Config(object):
 #	'20RampTime',
 #	'noRampTime',
 #        'logbsize256',
-        'WBT-3R-6O-1K-1.5K',
-        'WBT-3R-6O-10K-15K',
-        'WBT-3R-6O-100K-200K',
+#        'WBT-3R-6O-1K-1.5K',
+#        'WBT-3R-6O-10K-15K',
+#        'WBT-3R-6O-100K-200K',
 #        'WBT-1R-6O-500-1K',
 #        'WBT-1R-6O-500-5K',
 #        'WBT-1R-6O-1K-1.5K',
