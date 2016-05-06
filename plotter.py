@@ -110,7 +110,8 @@ class Plotter(object):
             fig.subplots_adjust(top=0.95)
             fig.subplots_adjust(bottom=0.4)
             if self.args.DESTINATION:
-                plt.savefig(self.args.DESTINATION[0] + '/' + test[0] + '.pdf')
+                path = os.path.realpath(self.args.DESTINATION[0])
+                plt.savefig(path + '/' + test[0] + '.pdf')
             else:
                 plt.savefig('/home/' + pwd.getpwuid(os.getuid()).pw_name +
                             '/Dropbox/Cephios/fioplot/results/' + test[0] + '.pdf')
