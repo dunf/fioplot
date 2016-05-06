@@ -79,9 +79,6 @@ class Plotter(object):
                     job_values.append(values[i])
                     raw_iops_avg += numpy.mean(job_values)
                     i += 1
-
-
-
                 # Tuple containing test data are added to an array
                 self.test_objects.append((conf, test[0], raw_iops_avg, iops_sum))
 
