@@ -46,8 +46,7 @@ class Plotter(object):
             for test in self.test_type:
                 raw_file = os.path.join(test_dir, conf, newest, test[0] + '-iopslog_iops.log')
                 fio_output = os.path.join(test_dir, conf, newest, test[0])
-                time = []
-                values = []
+
                 try:
                     with open(fio_output) as file:
                         print(fio_output)
@@ -58,39 +57,30 @@ class Plotter(object):
                 except FileNotFoundError:
                     print("Error! File ", fio_output, "not found...")
                     continue
+                time = []
+                values = []
                 try:
                     with open(raw_file) as file:
-                        print(raw_file)
                         for line in file:
                             line_data = line.split(',') # [0] is time, [1] is IOPS
                             time.append(int(line_data[0]))
                             values.append(int(line_data[1]))
+                        time.append(0)
                 except FileNotFoundError:
                     print("Error!", raw_file, "not found...")
                     continue
                 i = 0
                 raw_iops_avg = 0
-             #   for job in range(test[1]):  # Test[1] = number of jobs
-             #       job_values = []
-             #       while time[i] <= time[i+1]:
-             #           job_values.append(values[i])
-             #           i += 1
-             #       job_values.append(values[i])
-             #       raw_iops_avg += numpy.mean(job_values)
-             #       i += 1
+                for job in range(test[1]):  # Test[1] = number of jobs
+                    job_values = []
+                    while time[i] <= time[i+1]:
+                        job_values.append(values[i])
+                        i += 1
+                    job_values.append(values[i])
+                    raw_iops_avg += numpy.mean(job_values)
+                    i += 1
 
-                pre = 0
-                jv = []
-                k = 0
-                for t, v in zip(time, values):
-                    if pre <= t:
-                        jv.append(values[k])
-                        k += 1
-                        pre = t
-                    else:
-                        raw_iops_avg += numpy.mean(jv)
-                        jv.append(values[k])
-                        k += 1
+
 
                 # Tuple containing test data are added to an array
                 self.test_objects.append((conf, test[0], raw_iops_avg, iops_sum))
