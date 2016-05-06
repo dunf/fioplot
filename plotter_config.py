@@ -11,47 +11,64 @@ class Config(object):
 #	'20RampTime',
 #	'noRampTime',
 #        'logbsize256',
-#        'WBT-3R-3OSD',   #      replicatest_3
-#        'WBT-3R-4OSD',   #      replicatest_4
-#        'WBT-3R-5OSD',   #      replicatest_5
-#        'WBT-3R-6OSD',   #      replicatest_6
-#        'NoWBT-3R-6OSD', #      Dflt_NoWBT_baseline',
-#        'WBT-3Repl-6OSD-MS5',      # wb_maxsync5',
-        'WBT-1R-1OSD-MS1',
-        'WBT-1R-1OSD-MS30',
-        'WBT-1R-1OSD-MS40',
-#        'WBT-1R-1OSD-MS60',
-        'WBT-1R-1OSD-MS90',
-        'WBT-1R-1OSD-MS120',
-        'WBT-1R-1OSD-MS240',
-    	'WBT-1R-1OSD-QMO3K',
-        'WBT-1R-1OSD-QMO0.5K',
-        'WBT-1R-1OSD-QCMO_3K',
-        'WBT-1R-1OSD-XFSIO2K0.5K',
-        'WBT-1R-1OSD-XFSIO2K1K',
-	'WBT-1R-1OSD-JW100',
-	'WBT-1R-1OSD-JW50',
-	'WBT-1R-1OSD-JW200',
-	'WBT-1R-1OSD-JW1K',
-	'WBT-1R-1OSD-DEF',
-#        'WBT-1R-1OSD',
-#        'WBT-1R-2OSD',   #      osdtest_2
-#        'WBT-1R-3OSD',   #      osdtest_3
-#        'WBT-1R-4OSD',   #      osdtest_4
-#        'WBT-1R-5OSD',   #      osdtest_5
-#        'WBT-1R-6OSD',   #      osdtest_6
+        'WBT-3R-6O-1K-1.5K',
+        'WBT-3R-6O-10K-15K',
+        'WBT-3R-6O-100K-200K',
+#        'WBT-1R-6O-500-1K',
+#        'WBT-1R-6O-500-5K',
+#        'WBT-1R-6O-1K-1.5K',
+#        'WBT-1R-6O-2K-2.5K',
+#        'WBT-1R-6O-3K-5K',
+#        'WBT-1R-6O-10K-15K',
+#        'WBT-1R-6O-100K-200K',
+#        'WBT-1R-6O-jstore100',
+#        'WBT-1R-6O-jstore3K',
+#        'WBT-3R-3O',   #      replicatest_3
+#        'WBT-3R-4O',   #      replicatest_4
+#        'WBT-3R-5O',   #      replicatest_5
+#        'WBT-3R-6O',   #      replicatest_6
+#        'NoWBT-3R-6O', #      Dflt_NoWBT_baseline',
+#        'WBT-3R-6O-MS5',      # wb_maxsync5',
+#        'WBT-1R-1O-MS1',
+#        'WBT-1R-1O-MS30',
+#        'WBT-1R-1O-MS40',
+#        'WBT-1R-1O-MS60',
+#        'WBT-1R-1O-MS90',
+#        'WBT-1R-1O-MS120',
+#        'WBT-1R-1O-MS240',
+#        'WBT-1R-1O-QMO3K',
+#        'WBT-1R-1O-QMO0.5K',
+#        'WBT-1R-1O-QCMO_3K',
+#        'WBT-1R-1O-XFSIO2K0.5K',
+#        'WBT-1R-1O-XFSIO2K1K',
+#    	'WBT-1R-1O-JW100',
+#	    'WBT-1R-1O-JW50',
+#    	'WBT-1R-1O-JW200',
+#    	'WBT-1R-1O-JW1K',
+#        'WBT-1R-1O-DEF',
+#        'WBT-1R-1O',
+#        'WBT-1R-2O',   #      osdtest_2
+#        'WBT-1R-3O',   #      osdtest_3
+#        'WBT-1R-4O',   #      osdtest_4
+#        'WBT-1R-5O',   #      osdtest_5
+#        'WBT-1R-6O',   #      osdtest_6
+#        'WBT-1R-6O-JW1000',
+#        'WBT-1R-6O-JW500',
+#        'WBT-1R-6O-JW300',
+#        'WBT-1R-6O-JW200',
+#        'WBT-1R-6O-JW100',
+#        'WBT-1R-6O-JW50',
+#        'WBT-1R-6O-JW20',
 #        'wbthrottle',
 #        'wbthrottle_run_2',
 #        'wbthrottle_run_3',
 #        'DebugOff_run_1',
 #        'tmp',       
-#        'OSD_HDD Sync 250',       # onedrive_ssd_max250_run_1
-#         'NoWBT-1R-1OSD-SSD',      # Single OSD_SSD',       # onedrive_ssd_run_2a
-#         'NoWBT-1R-1OSD-HDD',      # Single OSD_HDD
+#         '1OSD-HDD-Sync250',     #'OSD_HDD Sync 250',       # onedrive_ssd_max250_run_1
+#         'NoWBT-1R-1O-SSD',      # Single OSD_SSD',       # onedrive_ssd_run_2a
+#         'NoWBT-1R-1O-HDD',      # Single OSD_HDD
 #        'OSD_HDD client cache',   # onedrive_ssd_max250_run_2
 #        'JumboFrames_run_1',    # 1 Replica + default settings.
-#        '1 Replica MS 5',       # 1_replica_run_1
-#        '1 Replica MS 10',      # 1_replica_run_2_maxsync_10
 #      	'SAS 15k disk1',  # sasd1Trinity
 #      	'SAS 10k disk2',   # sasd2Trinity
 #      	'SAS 10k disk3',     # sasd1Apoc
@@ -68,17 +85,21 @@ class Config(object):
 #        'titlap_3',
 #        'jobs_qd_testing_run_1',
 #        'MaxSync_5_run_1',
-#        '1 sec',
-#        '5 sec',
+#        '1R-Sync-5sec',     #'1 Replica MS 5',       # 1_replica_run_1
+#        '1R-Sync-10sec',    #'1 Replica MS 10',      # 1_replica_run_2_maxsync_10
+#        '3R-Sync-1sec',     #'1 sec',
+#        '3R-Sync-5sec',     #'5 sec',
+#        '3R-Sync-10sec',    #10 sec',
+#        '3R-Sync-200sec',   # '200 sec',    # MaxSync200
 #        'MaxSync_1_run_1',
 #        'MaxSync_10_run_1',
 #        'MaxSync_10_run_2',
 #        'MaxSync_10_run_3',
-#        '10 sec',
+
 #        'HDD_ONLY_run_1',
 #        'HDD_ONLY_run_2',
 #        '9-10 sec',   # Max10Min9
-#        '200 sec',    # MaxSync200
+
 #        'Maxsynctest1',     # Max sync 1
 #        'Maxsynctest2',     # Max sync 5
 #        'Maxsynctest3',     # Max sync 10
