@@ -22,8 +22,6 @@ class Args(object):
     parser = argparse.ArgumentParser()
     parser.add_argument("-t", "--testdir", help="Generate barchart for all test configurations")
     parser.add_argument('-d', '--destination', help='Destination dir for output files', nargs=1)
-    parser.add_argument('-r', '--histogram', nargs=1,
-                        help='Dir in which you want to generate histograms')
     args = parser.parse_args()
     DIR = args.testdir
     DESTINATION = args.destination
