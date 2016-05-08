@@ -20,11 +20,14 @@ import pwd
 
 class Args(object):
     parser = argparse.ArgumentParser()
-    parser.add_argument("-t", "--testdir", help="Generate barchart for all test configurations")
-    parser.add_argument('-d', '--destination', help='Destination dir for output files', nargs=1)
+    parser.add_argument("-s", "--source", help="Source files", nargs=1, required=True)
+    parser.add_argument('-d', '--destination', help='Output directory', nargs=1)
+    parser.add_argument('-r', '--textfile', help='Generates a textfile with scores', action='store_true')
     args = parser.parse_args()
-    DIR = args.testdir
+    DIR = args.source
     DESTINATION = args.destination
+    TEXTFILE = args.textfile
+
 
 
 class Plotter(object):
@@ -35,15 +38,14 @@ class Plotter(object):
 
     def read_files(self):
         for conf in self.configs:
-            my_path = os.path.join(self.args.DIR, conf)
+            my_path = os.path.join(self.args.DIR[0], conf)
             newest_tmp = sorted(os.listdir(my_path),    # Needed for compatibility with run_fio.sh
                 key=lambda last_change: os.path.getctime(os.path.join(my_path, last_change)))
             newest = newest_tmp[-1]
-            test_dir = os.path.realpath(self.args.DIR)
+            test_dir = os.path.realpath(self.args.DIR[0])
             for test in self.test_type:
                 raw_file = os.path.join(test_dir, conf, newest, test[0] + '-iopslog_iops.log')
                 fio_output = os.path.join(test_dir, conf, newest, test[0])
-                file_exists = False
                 time = []
                 values = []
                 try:
@@ -52,7 +54,6 @@ class Plotter(object):
                         for line in file:
                             if 'iops' in line:
                                 iops_sum += int(line.split('iops=')[1].split(',')[0])   # IOPS
-                        file_exists = True
                 except FileNotFoundError:
                     print("Error! File ", fio_output, "not found...")
                     continue
@@ -80,13 +81,22 @@ class Plotter(object):
                 # Tuple containing test data are added to an array
                 self.test_objects.append((conf, test[0], raw_iops_avg, iops_sum, deviation))
 
-    def create_barchart(self):
+    def get_destination(self):
+        if self.args.DESTINATION:
+            return self.args.DESTINATION[0]
+        else:
+            return os.getcwd()
+
+    def make_chart(self):
         for test in self.test_type:
             raw_means = []
             names = []
             fio_means = []
             std_dev = []
             print("Test: ", test[2])
+            if self.args.TEXTFILE:
+                with open(os.path.join(self.get_destination(), 'scores.txt'), 'w') as file:
+                    file.write('Test: ' + test[2] + "\n")
             for conf in self.test_objects:
                 conf_name, test_name, raw_iops, fio_iops, deviation = conf
                 if conf[1] == test[0]:
@@ -98,6 +108,12 @@ class Plotter(object):
                 print(" " * 4, "Raw IOPS: ", conf[2])
                 print(" " * 4, "Fio IOPS: ", conf[3])
                 print(" " * 4, "Standard Deviation: ", conf[4])
+                if self.args.TEXTFILE:
+                    with open(os.path.join(self.get_destination(), 'scores.txt'), 'a') as file:
+                        file.write(" " * 2 + 'Configuration: ' + str(conf[0]) + "\n")
+                        file.write(" " * 4 + 'Raw IOPS: ' + str(conf[2]) + "\n")
+                        file.write(" " * 4 + 'Fio IOPS: ' + str(conf[3]) + "\n")
+                        file.write(" " * 4 + 'Standard Deviation: ' + str(conf[4]) + "\n")
             ind = numpy.arange(len(raw_means))
             width = 0.3
             rects1 = plt.bar(ind, raw_means, width, color='gray', align='center', yerr=std_dev,
@@ -114,11 +130,7 @@ class Plotter(object):
             fig = plt.gcf()
             fig.subplots_adjust(top=0.95)
             fig.subplots_adjust(bottom=0.4)
-            if self.args.DESTINATION:
-                plt.savefig(os.path.realpath(self.args.DESTINATION[0] + '/' + test[0] + '.pdf'))
-            else:
-                plt.savefig('/home/' + pwd.getpwuid(os.getuid()).pw_name +
-                            '/Dropbox/Cephios/fioplot/results/' + test[0] + '.pdf')
+            plt.savefig(os.path.join(self.get_destination(), test[0] + '.pdf'), format='pdf')
             print('-' * 90)
             plt.close()
 
@@ -127,7 +139,7 @@ def main():
     p = Plotter()
     if p.args.DIR:
         p.read_files()
-        p.create_barchart()
+        p.make_chart()
     else:
         pass
 
