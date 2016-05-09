@@ -87,6 +87,12 @@ class Plotter(object):
         else:
             return os.getcwd()
 
+    def tmp(self):
+        for var in self.test_objects:
+            print(var)
+
+
+
     def make_chart(self):
         if self.args.TEXTFILE:
             with open(os.path.join(self.get_destination(), 'scores.txt'), 'w') as file:
@@ -96,27 +102,27 @@ class Plotter(object):
             names = []
             fio_means = []
             std_dev = []
-            print("Test: ", test[2])
+            print("Test: ", test)
             if self.args.TEXTFILE:
                 with open(os.path.join(self.get_destination(), 'scores.txt'), 'a') as file:
                     file.write('Test: ' + test[2] + "\n")
             for conf in self.test_objects:
                 conf_name, test_name, raw_iops, fio_iops, deviation = conf
-                if conf[1] == test[0]:
+                if test[0] == test_name:
                     names.append(conf_name)
                     fio_means.append(fio_iops)
                     raw_means.append(raw_iops)
                     std_dev.append(deviation)
-                print(" " * 2, "Configuration: ", conf[0])
-                print(" " * 4, "Raw IOPS: ", conf[2])
-                print(" " * 4, "Fio IOPS: ", conf[3])
-                print(" " * 4, "Standard Deviation: ", conf[4])
-                if self.args.TEXTFILE:
-                    with open(os.path.join(self.get_destination(), 'scores.txt'), 'a') as file:
-                        file.write(" " * 2 + 'Configuration: ' + str(conf[0]) + "\n")
-                        file.write(" " * 4 + 'Raw IOPS: ' + str(conf[2]) + "\n")
-                        file.write(" " * 4 + 'Fio IOPS: ' + str(conf[3]) + "\n")
-                        file.write(" " * 4 + 'Standard Deviation: ' + str(conf[4]) + "\n")
+                    print(" " * 2, "Configuration: ", conf_name)
+                    print(" " * 4, "Raw IOPS: ", raw_iops)
+                    print(" " * 4, "Fio IOPS: ", fio_iops)
+                    print(" " * 4, "Standard Deviation: ", deviation)
+                    if self.args.TEXTFILE:
+                        with open(os.path.join(self.get_destination(), 'scores.txt'), 'a') as file:
+                            file.write(" " * 2 + 'Configuration: ' + str(conf_name) + "\n")
+                            file.write(" " * 4 + 'Raw IOPS: ' + str(raw_iops) + "\n")
+                            file.write(" " * 4 + 'Fio IOPS: ' + str(fio_iops) + "\n")
+                            file.write(" " * 4 + 'Standard Deviation: ' + str(deviation) + "\n")
             ind = numpy.arange(len(raw_means))
             width = 0.3
             rects1 = plt.bar(ind, raw_means, width, color='gray', align='center', yerr=std_dev,
@@ -143,6 +149,7 @@ def main():
     if p.args.DIR:
         p.read_files()
         p.make_chart()
+  #      p.tmp()
     else:
         pass
 
