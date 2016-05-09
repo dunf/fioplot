@@ -1,9 +1,12 @@
 #!/usr/bin/python3
 
 class Config(object):
+    def get_default_path(self, config):
+        return '/home/' + pwd.getpwuid(os.getuid()).pw_name + '/Dropbox/Cephios/fioplot/results/' + config + '.pdf'
+
     configurations = [
 #        'Samsung 840 EVO',        # SSD baseline test
-        'BaselineSSD',           # Full run på dozer
+#        'BaselineSSD',           # Full run på dozer
 #        'Samsung 840 disk1',               # baseSSDapoc
 #        'Samsung 840 disk2',              # baseSSDdozer
 #        'Samsung 840 disk3',             # baseSSDswitch
@@ -17,23 +20,23 @@ class Config(object):
 #        'WBT-3R-6OSD',   #      replicatest_6
 #        'NoWBT-3R-6OSD', #      Dflt_NoWBT_baseline',
 #        'WBT-3Repl-6OSD-MS5',      # wb_maxsync5',
-#        'WBT-1R-1OSD-MS1',
-#        'WBT-1R-1OSD-MS30',
-#        'WBT-1R-1OSD-MS40',
+        'WBT-1R-1OSD-MS1',
+        'WBT-1R-1OSD-MS30',
+        'WBT-1R-1OSD-MS40',
 #        'WBT-1R-1OSD-MS60',
-#        'WBT-1R-1OSD-MS90',
-#        'WBT-1R-1OSD-MS120',
-#        'WBT-1R-1OSD-MS240',
-#    	'WBT-1R-1OSD-QMO3K',
-#        'WBT-1R-1OSD-QMO0.5K',
-#        'WBT-1R-1OSD-QCMO_3K',
-#        'WBT-1R-1OSD-XFSIO2K0.5K',
-#        'WBT-1R-1OSD-XFSIO2K1K',
-#	'WBT-1R-1OSD-JW100',
-#	'WBT-1R-1OSD-JW50',
-#	'WBT-1R-1OSD-JW200',
-#	'WBT-1R-1OSD-JW1K',
-#	'WBT-1R-1OSD-DEF',
+        'WBT-1R-1OSD-MS90',
+        'WBT-1R-1OSD-MS120',
+        'WBT-1R-1OSD-MS240',
+    	'WBT-1R-1OSD-QMO3K',
+        'WBT-1R-1OSD-QMO0.5K',
+        'WBT-1R-1OSD-QCMO_3K',
+        'WBT-1R-1OSD-XFSIO2K0.5K',
+        'WBT-1R-1OSD-XFSIO2K1K',
+        'WBT-1R-1OSD-JW100',
+        'WBT-1R-1OSD-JW50',
+        'WBT-1R-1OSD-JW200',
+        'WBT-1R-1OSD-JW1K',
+        'WBT-1R-1OSD-DEF',
 #        'WBT-1R-1OSD',
 #        'WBT-1R-2OSD',   #      osdtest_2
 #        'WBT-1R-3OSD',   #      osdtest_3
@@ -44,7 +47,7 @@ class Config(object):
 #        'wbthrottle_run_2',
 #        'wbthrottle_run_3',
 #        'DebugOff_run_1',
-#        'tmp',       
+#        'tmp',
 #        'OSD_HDD Sync 250',       # onedrive_ssd_max250_run_1
 #         'NoWBT-1R-1OSD-SSD',      # Single OSD_SSD',       # onedrive_ssd_run_2a
 #         'NoWBT-1R-1OSD-HDD',      # Single OSD_HDD
