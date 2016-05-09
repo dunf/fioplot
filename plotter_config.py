@@ -1,9 +1,6 @@
 #!/usr/bin/python3
 
 class Config(object):
-    def get_default_path(self, config):
-        return '/home/' + pwd.getpwuid(os.getuid()).pw_name + '/Dropbox/Cephios/fioplot/results/' + config + '.pdf'
-
     configurations = [
 #        'Samsung 840 EVO',        # SSD baseline test
 #        'BaselineSSD',           # Full run på dozer
@@ -20,23 +17,23 @@ class Config(object):
 #        'WBT-3R-6OSD',   #      replicatest_6
 #        'NoWBT-3R-6OSD', #      Dflt_NoWBT_baseline',
 #        'WBT-3Repl-6OSD-MS5',      # wb_maxsync5',
-        'WBT-1R-1OSD-MS1',
-        'WBT-1R-1OSD-MS30',
-        'WBT-1R-1OSD-MS40',
+#        'WBT-1R-1OSD-MS1',
+#        'WBT-1R-1OSD-MS30',
+#        'WBT-1R-1OSD-MS40',
 #        'WBT-1R-1OSD-MS60',
-        'WBT-1R-1OSD-MS90',
-        'WBT-1R-1OSD-MS120',
-        'WBT-1R-1OSD-MS240',
-    	'WBT-1R-1OSD-QMO3K',
-        'WBT-1R-1OSD-QMO0.5K',
-        'WBT-1R-1OSD-QCMO_3K',
-        'WBT-1R-1OSD-XFSIO2K0.5K',
-        'WBT-1R-1OSD-XFSIO2K1K',
-        'WBT-1R-1OSD-JW100',
-        'WBT-1R-1OSD-JW50',
-        'WBT-1R-1OSD-JW200',
-        'WBT-1R-1OSD-JW1K',
-        'WBT-1R-1OSD-DEF',
+#        'WBT-1R-1OSD-MS90',
+#        'WBT-1R-1OSD-MS120',
+#        'WBT-1R-1OSD-MS240',
+#    	'WBT-1R-1OSD-QMO3K',
+#        'WBT-1R-1OSD-QMO0.5K',
+#        'WBT-1R-1OSD-QCMO_3K',
+#        'WBT-1R-1OSD-XFSIO2K0.5K',
+#        'WBT-1R-1OSD-XFSIO2K1K',
+#        'WBT-1R-1OSD-JW100',
+#        'WBT-1R-1OSD-JW50',
+#        'WBT-1R-1OSD-JW200',
+#        'WBT-1R-1OSD-JW1K',
+#        'WBT-1R-1OSD-DEF',
 #        'WBT-1R-1OSD',
 #        'WBT-1R-2OSD',   #      osdtest_2
 #        'WBT-1R-3OSD',   #      osdtest_3
@@ -73,15 +70,15 @@ class Config(object):
 #        'MaxSync_5_run_1',
 #        '1 sec',
 #        '5 sec',
+#        '10 sec',
+#        '200 sec',    # MaxSync200
 #        'MaxSync_1_run_1',
 #        'MaxSync_10_run_1',
 #        'MaxSync_10_run_2',
 #        'MaxSync_10_run_3',
-#        '10 sec',
 #        'HDD_ONLY_run_1',
 #        'HDD_ONLY_run_2',
 #        '9-10 sec',   # Max10Min9
-#        '200 sec',    # MaxSync200
 #        'Maxsynctest1',     # Max sync 1
 #        'Maxsynctest2',     # Max sync 5
 #        'Maxsynctest3',     # Max sync 10
