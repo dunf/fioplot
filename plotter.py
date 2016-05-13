@@ -87,12 +87,6 @@ class Plotter(object):
         else:
             return os.getcwd()
 
-    def tmp(self):
-        for var in self.test_objects:
-            print(var)
-
-
-
     def make_chart(self):
         if self.args.TEXTFILE:
             with open(os.path.join(self.get_destination(), 'scores.txt'), 'w') as file:
@@ -102,7 +96,7 @@ class Plotter(object):
             names = []
             fio_means = []
             std_dev = []
-            print("Test: ", test)
+            print("Test: ", test[2])
             if self.args.TEXTFILE:
                 with open(os.path.join(self.get_destination(), 'scores.txt'), 'a') as file:
                     file.write('Test: ' + test[2] + "\n")
