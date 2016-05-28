@@ -15,26 +15,59 @@ from matplotlib import pyplot as plt
 import numpy
 import plotter_config
 import matplotlib.patches as mpatches
-import pwd
 
 
 class Args(object):
     parser = argparse.ArgumentParser()
+    parser.add_argument("-t", "--type", help="Select chart type", choices=["bar", "line"],
+                        default="bar")
     parser.add_argument("-s", "--source", help="Source files", nargs=1, required=True)
     parser.add_argument('-d', '--destination', help='Output directory', nargs=1)
     parser.add_argument('-r', '--textfile', help='Generates a textfile with scores', action='store_true')
     args = parser.parse_args()
-    DIR = args.source
-    DESTINATION = args.destination
-    TEXTFILE = args.textfile
 
+    def get_type(self):
+        return self.args.type
+
+    def get_destination(self):
+        if self.args.destination is None:
+            return os.getcwd()
+        else:
+            return self.args.destination[0]
+
+    def source_files(self):
+        return self.args.source[0]
+
+    def textfile(self):
+        return self.args.textfile
+
+    def barchart(self):
+        if self.args.barchart is None:
+            return False
+        else:
+            return True
 
 
 class Plotter(object):
-    args = Args()
+    __args = Args()
     test_objects = []
     configs = plotter_config.Config.configurations
     test_type = plotter_config.Config.test_type
+
+    def get_type(self):
+        return self.__args.get_type()
+
+    def barchart_flag(self):
+        return self.__args.barchart()
+
+    def get_source_files(self):
+        return self.__args.source_files()
+
+    def get_destination(self):
+        return self.__args.get_destination()
+
+    def textfile_flag(self):
+        return self.__args.textfile()
 
     def parse_fio_output(self, fio_output):
         try:
@@ -79,11 +112,11 @@ class Plotter(object):
 
     def read_files(self):
         for conf in self.configs:
-            my_path = os.path.join(self.args.DIR[0], conf)
+            my_path = os.path.join(self.get_source_files(), conf)
             newest_tmp = sorted(os.listdir(my_path),    # Needed for compatibility with run_fio.sh
                 key=lambda last_change: os.path.getctime(os.path.join(my_path, last_change)))
             newest = newest_tmp[-1]
-            test_dir = os.path.realpath(self.args.DIR[0])
+            test_dir = os.path.realpath(self.get_source_files())
             for test in self.test_type:
                 raw_file = os.path.join(test_dir, conf, newest, test[0] + '-iopslog_iops.log')
                 fio_output = os.path.join(test_dir, conf, newest, test[0])
@@ -93,15 +126,9 @@ class Plotter(object):
                 # Tuple containing test data are added to an array
                 self.test_objects.append((conf, test[0], raw_iops_avg, iops_sum, deviation))
 
-    def get_destination(self):
-        if self.args.DESTINATION:
-            return self.args.DESTINATION[0]
-        else:
-            return os.getcwd()
-
     def make_chart(self):
         self.read_files()
-        if self.args.TEXTFILE:
+        if self.textfile_flag():
             with open(os.path.join(self.get_destination(), 'scores.txt'), 'w') as file:
                 pass
         for test in self.test_type:
@@ -110,7 +137,7 @@ class Plotter(object):
             fio_means = []
             std_dev = []
             print("Test: ", test[2])
-            if self.args.TEXTFILE:
+            if self.textfile_flag():
                 with open(os.path.join(self.get_destination(), 'scores.txt'), 'a') as file:
                     file.write('Test: ' + test[2] + "\n")
             for conf in self.test_objects:
@@ -120,21 +147,21 @@ class Plotter(object):
                     fio_means.append(fio_iops)
                     raw_means.append(raw_iops)
                     std_dev.append(deviation)
-                    print(" " * 2, "Configuration: ", conf_name)
-                    print(" " * 4, "Raw IOPS: ", raw_iops)
-                    print(" " * 4, "Fio IOPS: ", fio_iops)
-                    print(" " * 4, "Standard Deviation: ", deviation)
-                    if self.args.TEXTFILE:
+                    print(" " * 4, "Configuration: ", conf_name)
+                    print(" " * 8, "Raw IOPS: ", raw_iops)
+                    print(" " * 8, "Fio IOPS: ", fio_iops)
+                    print(" " * 8, "Standard Deviation: ", deviation)
+                    if self.textfile_flag():
                         with open(os.path.join(self.get_destination(), 'scores.txt'), 'a') as file:
-                            file.write(" " * 2 + 'Configuration: ' + str(conf_name) + "\n")
-                            file.write(" " * 4 + 'Raw IOPS: ' + str(raw_iops) + "\n")
-                            file.write(" " * 4 + 'Fio IOPS: ' + str(fio_iops) + "\n")
-                            file.write(" " * 4 + 'Standard Deviation: ' + str(deviation) + "\n")
+                            file.write(" " * 4 + 'Configuration: ' + str(conf_name) + "\n")
+                            file.write(" " * 8 + 'Raw IOPS: ' + str(raw_iops) + "\n")
+                            file.write(" " * 8 + 'Fio IOPS: ' + str(fio_iops) + "\n")
+                            file.write(" " * 8 + 'Standard Deviation: ' + str(deviation) + "\n")
             ind = numpy.arange(len(raw_means))
             width = 0.3
-            rects1 = plt.bar(ind, raw_means, width, color='gray', align='center', yerr=std_dev,
+            plt.bar(ind, raw_means, width, color='gray', align='center', yerr=std_dev,
                 error_kw=dict(ecolor='black'))
-            rects2 = plt.bar(ind+width, fio_means, width, color='green', align='center')
+            plt.bar(ind+width, fio_means, width, color='green', align='center')
             plt.ylabel('IOPS')
             plt.title(test[2])
             plt.xticks(ind+width/2, names, rotation=270)
@@ -153,11 +180,15 @@ class Plotter(object):
 
 def main():
     p = Plotter()
-    if p.args.DIR:
+    chart_type = p.get_type()
+    if chart_type == 'bar':
         p.make_chart()
-  #      p.tmp()
+    elif chart_type == 'line':
+        raise NotImplementedError
     else:
-        pass
+        raise NotImplementedError
+
+
 
 
 if __name__ == "__main__":
