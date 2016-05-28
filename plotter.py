@@ -1,6 +1,6 @@
 #!/usr/bin/python3
 
-# This is a fork of Erik Hjelmås' plotsintex script.
+# This is a fork of Erik HjelmÃ¥s' plotsintex script.
 # Usage: ./plotter -t DIRECTORY
 # The directories needs to follow this structure:
 # DIRECTORY/ConfigName/SomeFolder/fiofiles
@@ -36,6 +36,47 @@ class Plotter(object):
     configs = plotter_config.Config.configurations
     test_type = plotter_config.Config.test_type
 
+    def parse_fio_output(self, fio_output):
+        try:
+            with open(fio_output) as file:
+                iops_sum = 0
+                for line in file:
+                    if 'iops' in line:
+                        iops_sum += int(line.split('iops=')[1].split(',')[0])   # IOPS
+        except FileNotFoundError:
+            print("Error! File ", fio_output, "not found...")
+          #  continue
+        return iops_sum
+
+    def parse_raw_output(self, raw_file):
+        time = []
+        values = []
+        try:
+            with open(raw_file) as file:
+                for line in file:
+                    line_data = line.split(',') # index 0 is time, index 1 is IOPS
+                    time.append(int(line_data[0]))
+                    values.append(int(line_data[1]))
+                time.append(0)
+        except FileNotFoundError:
+            print("Error!", raw_file, "not found...")
+            #continue
+        return time, values
+
+    def calculate_values(self, numjobs, time, values):
+        i = 0
+        raw_iops_avg = 0
+        for job in range(numjobs):  # Test[1] = number of jobs
+            job_values = []
+            while time[i] <= time[i+1]:
+                job_values.append(values[i])
+                i += 1
+            job_values.append(values[i])
+            raw_iops_avg += numpy.mean(job_values)
+            i += 1
+        deviation = numpy.std(values)
+        return raw_iops_avg, deviation
+
     def read_files(self):
         for conf in self.configs:
             my_path = os.path.join(self.args.DIR[0], conf)
@@ -46,38 +87,9 @@ class Plotter(object):
             for test in self.test_type:
                 raw_file = os.path.join(test_dir, conf, newest, test[0] + '-iopslog_iops.log')
                 fio_output = os.path.join(test_dir, conf, newest, test[0])
-                time = []
-                values = []
-                try:
-                    with open(fio_output) as file:
-                        iops_sum = 0
-                        for line in file:
-                            if 'iops' in line:
-                                iops_sum += int(line.split('iops=')[1].split(',')[0])   # IOPS
-                except FileNotFoundError:
-                    print("Error! File ", fio_output, "not found...")
-                    continue
-                try:
-                    with open(raw_file) as file:
-                        for line in file:
-                            line_data = line.split(',') # index 0 is time, index 1 is IOPS
-                            time.append(int(line_data[0]))
-                            values.append(int(line_data[1]))
-                        time.append(0)
-                except FileNotFoundError:
-                    print("Error!", raw_file, "not found...")
-                    continue
-                i = 0
-                raw_iops_avg = 0
-                for job in range(test[1]):  # Test[1] = number of jobs
-                    job_values = []
-                    while time[i] <= time[i+1]:
-                        job_values.append(values[i])
-                        i += 1
-                    job_values.append(values[i])
-                    raw_iops_avg += numpy.mean(job_values)
-                    i += 1
-                deviation = numpy.std(values)
+                iops_sum = self.parse_fio_output(fio_output)
+                time, values = self.parse_raw_output(raw_file)
+                raw_iops_avg, deviation = self.calculate_values(test[1], time, values)
                 # Tuple containing test data are added to an array
                 self.test_objects.append((conf, test[0], raw_iops_avg, iops_sum, deviation))
 
@@ -88,6 +100,7 @@ class Plotter(object):
             return os.getcwd()
 
     def make_chart(self):
+        self.read_files()
         if self.args.TEXTFILE:
             with open(os.path.join(self.get_destination(), 'scores.txt'), 'w') as file:
                 pass
@@ -141,7 +154,6 @@ class Plotter(object):
 def main():
     p = Plotter()
     if p.args.DIR:
-        p.read_files()
         p.make_chart()
   #      p.tmp()
     else:
