@@ -5,6 +5,7 @@
 # The directories needs to follow this structure:
 # DIRECTORY/ConfigName/SomeFolder/fiofiles
 # Add additional test configurations to plotter_config.py
+
 # Author: Mihkal Dunfjeld
 # Repository: https://bitbucket.org/dunf/fioplot/src/
 
@@ -18,60 +19,59 @@ from plotter_config import Config
 
 
 class Args(object):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--source", help="Source files", nargs=1, required=True)
-    parser.add_argument("-t", "--type", help="Select chart type", choices=["bar", "line"],
-                        default="bar")
-    parser.add_argument('-d', '--destination', help='Output directory', nargs=1)
-    parser.add_argument('-r', '--textfile', help='Generates a textfile with scores', action='store_true')
-    parser.parse_args()
-    args = parser.parse_args()
+    def __init__(self, parser = argparse.ArgumentParser()):
+        parser.add_argument("-s", "--source", help="Source files", nargs=1,
+                            required=True)
+        parser.add_argument("-t", "--type", help="Select chart type",
+                            choices=["bar", "line"],
+                            default="bar")
+        parser.add_argument('-d', '--destination', help='Output directory',
+                            nargs=1)
+        parser.add_argument('-r', '--textfile',
+                            help='Generates a textfile with scores',
+                            action='store_true')
+        parser.parse_args()
+        self._args = parser.parse_args()
 
-    def get_type(self):
+    def type(self):
         """Returns the type of chart to be generated. Default is bar chart."""
-        return self.args.type
+        return self._args.type
 
     def get_destination(self):
         """Sets the destination to a user specified directory if flag is set
         and sets destination to the current directory if flag is not set."""
-        return os.getcwd() if self.args.destination is None else self.args.destination[0]
+        return os.getcwd() if self._args.destination is None else self._args.destination[0]
 
     def source_files(self):
         """Returns the directory of the input files."""
-        return self.args.source[0]
+        return self._args.source[0]
 
     def textfile(self):
         """Returns True if textfile argument is set."""
-        return self.args.textfile
-
-    def barchart(self):
-        return True if self.args.barchart else False
+        return self._args.textfile
 
 
 class Plotter(object):
-    args = Args()
-    configs = Config.configurations
-    test_type = Config.test_type
+    def __init__(self, args = Args(), C = Config()):
+        self._args = args
+        self.configs = C.conf()
+        self.test_type = C.type()
 
     def get_type(self):
-        return self.args.get_type()
-
-# Hva skulle denne brukes til?!
-    def barchart_flag(self):
-        return True if self.args.barchart() else False
+        return self._args.type()
 
     def get_source_files(self):
         """Returns the source directory of input files."""
-        return self.args.source_files()
+        return self._args.source_files()
 
     def get_destination(self):
         """Returns destination directory for PDF's."""
-        return self.args.get_destination()
+        return self._args.get_destination()
 
     def textfile_flag(self):
         """Returns True if textfile flag is set for this particular
         instance."""
-        return self.args.textfile()
+        return self._args.textfile()
 
     def parse_fio_output(self, fio_output):
         """Parses the the output from fio and returns the aggregated iops
@@ -86,7 +86,8 @@ class Plotter(object):
         except FileNotFoundError:
             print("Error! File ", fio_output, "not found...")
 
-    def parse_raw_output(self, raw_file):
+    @staticmethod
+    def parse_raw_output(raw_file):
         """Parses the raw IOPS output file and returns a list of IOPS values and
         a list of the times at which the values were gathered."""
         time = []
@@ -94,7 +95,7 @@ class Plotter(object):
         try:
             with open(raw_file) as file:
                 for line in file:
-                    line_data = line.split(',') # index 0 is time, index 1 is IOPS
+                    line_data = line.split(',') #index 0 = time, index 1 = IOPS
                     time.append(int(line_data[0]))
                     values.append(int(line_data[1]))
                 time.append(0)
@@ -102,7 +103,10 @@ class Plotter(object):
         except FileNotFoundError:
             print("Error!", raw_file, "not found...")
 
-    def calculate_values(self, numjobs, time, values):
+    @staticmethod
+    def calculate_values(numjobs, time, values):
+        """Calculates and returns the average raw IOPS and standard deviaton
+        for each test."""
         i = 0
         raw_iops_avg = 0
         for job in range(numjobs):  # Test[1] = number of jobs
@@ -140,7 +144,7 @@ class Plotter(object):
         a barchart for each test."""
         self.read_files()
         if self.textfile_flag():
-            with open(os.path.join(self.args.get_destination(), 'scores.txt'), 'w') as file:
+            with open(os.path.join(self._args.get_destination(), 'scores.txt'), 'w') as file:
                 pass
         for test in self.test_type:
             raw_means = []
@@ -190,6 +194,7 @@ class Plotter(object):
 
 
 def main():
+    """Main entry point to the script."""
     p = Plotter()
     test_objects = p.read_files()
     if p.get_type() == 'bar':
